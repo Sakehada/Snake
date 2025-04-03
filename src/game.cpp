@@ -2,37 +2,13 @@
 #include "world.hpp"
 #include "window.hpp"
 #include "window_audio.hpp"
+
 struct Game;
 
 void init_game(Game *game, string filename)
 { // Initie la partie, y compris le monde
     game->world = new World;
     init_world_from_file(game->world, filename);
-    game->racket_y = game->world->height - 2;
-    game->racket_x = game->world->width / 2;
-    game->racket_half_width = 2;
-    game->ball_x = game->racket_x;
-    game->ball_y = game->racket_y - 1;
-    game->ball_speed = 80;
-    game->ball_dx = 0;
-    game->ball_dy = -1;
-    game->statut = Begin;
-    game->score = 0;
-    game->scrWin = 0;
-    for (int i = 0; i < game->world->height * game->world->width; i++) // Comptabilise les points du monde
-    {
-        switch (game->world->grid[i])
-        {
-        case Type1:
-            game->scrWin = game->scrWin + 1;
-            break;
-        case Type2:
-            game->scrWin = game->scrWin + 2;
-            break;
-        default:
-            break;
-        }
-    }
 }
 
 void move_ball(Window *window, Game *game)
@@ -191,40 +167,11 @@ void display_game(Window *window, Game *game)
         draw_fill_rectangle(window, (i % game->world->width * case_sizeX) - 1, (i / game->world->width * case_sizeY) - 1, case_sizeX - 1, case_sizeY - 1);
     }
 
-    set_color(&window->foreground, 0, 0, 200, 255);
-
-    draw_fill_rectangle(window, (game->racket_x - game->racket_half_width) * case_sizeX, game->racket_y * case_sizeY, case_sizeX * (1+game->racket_half_width * 2), case_sizeY);
-
-    set_color(&window->foreground, 200, 200, 200, 255);
-    draw_fill_rectangle(window, game->ball_x * case_sizeX, game->ball_y * case_sizeY, case_sizeX, case_sizeY);
 
     set_color(&window->foreground, 0, 0, 0, 255);
-    set_color(&window->background, 255, 255, 255, 255);
     string scr = "Score:" + to_string(game->score);
     draw_text(window, scr, 0, 0);
     refresh_window(window);
-}
-
-void move_racket(Game *game, int d) // Mouvement de la raquette
-{
-
-    if (game->statut == Play || game->statut == Begin)
-    {
-        if (d > 0 && game->world->width > game->racket_x + d + game->racket_half_width*2 -1) // Si on veux aller a droite
-        {
-            game->racket_x += d;
-        }
-        else if (d < 0 && 0 < game->racket_x - d - game->racket_half_width*2) // Aller a gauche
-
-        {
-            game->racket_x += d;
-        }
-
-        if (game->statut == Begin)
-        {
-            game->ball_x = game->racket_x;
-        }
-    }
 }
 
 bool keyboard_event(Game *game, Window* window, string pathMap) // regarde les actions du clavier
@@ -255,10 +202,10 @@ bool keyboard_event(Game *game, Window* window, string pathMap) // regarde les a
                 change_statut(&(game->statut));
                 return false;
             case SDLK_RIGHT: // Deplacer la raquette
-                move_racket(game, 1);
+                
                 return false;
             case SDLK_LEFT:
-                move_racket(game, -1);
+                
                 return false;
             default:
                 return false;

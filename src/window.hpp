@@ -8,6 +8,8 @@ using namespace std;
 
 struct Mixer;
 
+const string pathes[]{"","","","","",""};
+
 struct Window
 {
     Mixer* mixer;
@@ -15,8 +17,8 @@ struct Window
     SDL_Renderer *sdl_renderer;
     int width;
     int height;
-    SDL_Color background;
-    SDL_Color foreground;
+    SDL_Texture* background;
+    SDL_Texture** textures;
     TTF_Font *sdl_font;
 };
 

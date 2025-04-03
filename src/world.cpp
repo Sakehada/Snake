@@ -1,4 +1,6 @@
 #include "world.hpp"
+#include "enum.hpp"
+#include <fstream>
 
 
 void init_world(World *world, int w, int h)
@@ -15,20 +17,6 @@ void init_world(World *world, int w, int h)
 void free_world(World *world)
 {   // Supprime la grille du monde
     delete[] world->grid;
-}
-
-Block read(World *world, int x, int y)
-{ // Affiche dans la sortie le block à l'emplacement (x;y)
-    int i = getId(x,y,world->width);
-    if (i < 0 or i > world->height * world->width)
-    {
-        cout << "Erreur de coordonnee" << endl;
-        return Empty;
-    }
-    else
-    {
-        return world->grid[i];
-    }
 }
 
 void write(World *world, int x, int y, Block b)
@@ -58,17 +46,17 @@ void display(World *world)
         case Empty:
             cout << '.';
             break;
-        case Border:
-            cout << '#';
+        case R:
+            cout << 'R';
             break;
-        case Lose:
-            cout << '$';
+        case G:
+            cout << 'G';
             break;
-        case Type1:
-            cout << '1';
+        case B:
+            cout << 'B';
             break;
-        case Type2:
-            cout << '2';
+        case Star:
+            cout << 'S';
             break;
 
         default:
@@ -105,17 +93,17 @@ void init_world_from_file(World *world, string filename)
                 case '.':
                     b = Empty;
                     break;
-                case '#':
-                    b = Border;
+                case 'R':
+                    b = R;
                     break;
-                case '$':
-                    b = Lose;
+                case 'G':
+                    b = G;
                     break;
-                case '1':
-                    b = Type1;
+                case 'B':
+                    b = B;
                     break;
-                case '2':
-                    b = Type2;
+                case 'S':
+                    b = Star;
                     break;
                 default:
                     cout << "Erreur de lecture de la map: " << line[k] << endl;
