@@ -2,6 +2,7 @@
 #include "world.hpp"
 #include "window.hpp"
 #include "window_audio.hpp"
+#include "enum.hpp"
 
 struct Game;
 
@@ -9,13 +10,15 @@ void init_game(Game *game, string filename)
 { // Initie la partie, y compris le monde
     game->world = new World;
     init_world_from_file(game->world, filename);
+    *directions[HAUT] = -game->world->width;
+    *directions[BAS] = game->world->width;
+    *directions[GAUCHE] = -1;
+    *directions[DROITE] = 1;
 }
 
-void move_ball(Window *window, Game *game)
+void move_snake(Window *window, Game *game)
 { // bouge la balle
-    Block *detect_y = &game->world->grid[getId(game->ball_x, game->ball_y + game->ball_dy, game->world->width)]; // Block du haut ou du bas
-    Block *detect_x = &game->world->grid[getId(game->ball_x + game->ball_dx, game->ball_y, game->world->width)]; // Block de gauche ou de droite
-    Block *detect_xy = &game->world->grid[getId(game->ball_x + game->ball_dx, game->ball_y + game->ball_dy, game->world->width)]; // Block de diagonale
+    Block *detect_d = &game->world->grid[getId(game->ball_x, game->ball_y + game->ball_dy, game->world->width)]; // Block du haut ou du bas
     bool diagTest = true;
     switch (*detect_y) // gestion du block y
     {
@@ -161,10 +164,11 @@ void display_game(Window *window, Game *game)
     int case_sizeY = window->height / game->world->height;
     for (int i = 0; i < game->world->width * game->world->height; i++)
     {
-        set_color(&window->foreground, 0, 0, 0, 250);
-        draw_fill_rectangle(window, (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        set_color(&window->foreground, &game->colors[game->world->grid[i]]);
-        draw_fill_rectangle(window, (i % game->world->width * case_sizeX) - 1, (i / game->world->width * case_sizeY) - 1, case_sizeX - 1, case_sizeY - 1);
+        case Empty:
+            break;
+        switch(game->world->grid[i]){
+        
+       }
     }
 
 

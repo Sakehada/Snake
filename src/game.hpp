@@ -9,6 +9,8 @@ using namespace std;
 struct World;
 struct Window;
 
+int* directions;
+
 struct Statut{
     Begin,
     Play,
@@ -19,13 +21,13 @@ struct Statut{
 struct Body{
     Body* next;
     Body* previous;
-    int pos;
+    int* pos;
     BodyType type;
 }
 
 struct Snake{
     int head;
-    int d;
+    Direction* d;
     Body* queue;
     Body* neck;
 }

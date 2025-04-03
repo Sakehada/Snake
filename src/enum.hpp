@@ -26,6 +26,12 @@ enum Block
     Star
 };
 
+enum Direction{
+    HAUT,
+    BAS,
+    GAUCHE,
+    DROITE
+};
 
 
 
