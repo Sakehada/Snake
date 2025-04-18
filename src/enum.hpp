@@ -1,22 +1,25 @@
-enum ESample{
+enum ESample
+{
     Break,
     Bong,
     Music1,
     Music2
 };
 
-enum SoundType{
+enum SoundType
+{
     Music,
     Effect
 };
-
-enum BodyType{
+/*
+enum BodyType
+{
     RBODY,
     GBODY,
     BBODY,
     HEAD
 };
-
+*/
 enum Block
 {
     Empty,
@@ -25,14 +28,20 @@ enum Block
     B,
     Star
 };
-
-enum Direction{
+/*
+enum Direction
+{
     HAUT,
     BAS,
     GAUCHE,
     DROITE
 };
-
-
-
-
+*/
+enum Statut
+{
+    Play,
+    Pause,
+    Begin,
+    Win,
+    GameOver
+};

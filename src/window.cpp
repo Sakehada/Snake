@@ -80,10 +80,10 @@ void init_window(Window *window, int width, int height, string title)
         SDL_Quit();
     }
 
-    window->mixer = new Mixer;
+    /*window->mixer = new Mixer;
     init_audio(window->mixer);
     play(window->mixer, Music2);
-
+*/
 }
 void close_window(Window *window)
 {
