@@ -8,17 +8,17 @@ using namespace std;
 
 struct Mixer;
 
-const string pathes[]{"","","","","",""};
+const string pathes[]{"", "", "", "", "", ""};
 
 struct Window
 {
-    Mixer* mixer;
+    Mixer *mixer;
     SDL_Window *sdl_window;
     SDL_Renderer *sdl_renderer;
     int width;
     int height;
-    SDL_Texture* background;
-    SDL_Texture** textures;
+    SDL_Color background;
+    SDL_Color foreground;
     TTF_Font *sdl_font;
 };
 
