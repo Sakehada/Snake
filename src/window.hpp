@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include "window_audio.hpp"
 using namespace std;
 
 #ifndef WINDOW_HPP

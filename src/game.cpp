@@ -1,14 +1,10 @@
 #include "game.hpp"
-#include "world.hpp"
-#include "window.hpp"
-#include "window_audio.hpp"
-
-struct Game;
 
 void init_game(Game *game, string filename)
 { // Initie la partie, y compris le monde
     game->world = new World;
     init_world_from_file(game->world, filename);
+    game->score = 0;
 
     /*
      *directions[HAUT] = -game->world->width;
@@ -145,18 +141,18 @@ void change_statut(Statut *statut)
     switch (*statut)
     {
     case Begin:
-        *statut = Play;
+        *statut = Statut(Play);
         break;
     case Play:
-        *statut = Pause;
+        *statut = Statut(Pause);
         break;
     case Pause:
-        *statut = Play;
+        *statut = Statut(Play);
         break;
     case Win:
-        *statut = Begin;
+        *statut = Statut(Begin);
     case GameOver:
-        *statut = Begin;
+        *statut = Statut(Begin);
         break;
     }
 }
@@ -166,34 +162,38 @@ void display_game(Window *window, Game *game, SDL_Texture *FoodRed, SDL_Texture 
     clear_window(window);
     int case_sizeX = window->width / game->world->width;
     int case_sizeY = window->height / game->world->height;
+    set_color(&window->background, 255, 255, 255, 255);
     for (int i = 0; i < game->world->width * game->world->height; i++)
     {
-
+        draw_texture(window, BackgroundTux, (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
+    }
+    for (int i = 0; i < game->world->width * game->world->height; i++)
+    {
         switch (game->world->grid[i])
         {
-        case Empty:
-            draw_texture(window, BackgroundTux, (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-            break;
-        case R:
+        case Statut(R):
             draw_texture(window, FoodRed, (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
             break;
-        case G:
+        case Statut(G):
             draw_texture(window, FoodGreen, (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
             break;
-        case B:
+        case Statut(B):
             draw_texture(window, FoodBlue, (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
             break;
-        case Star:
+        case Statut(Star):
             draw_texture(window, FoodStar, (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
             break;
+        default:
+            break;
         }
-        }
+    }
 
     set_color(&window->foreground, 0, 0, 0, 255);
     string scr = "Score:" + to_string(game->score);
-    draw_text(window, scr, 0, 0);
+    draw_fill_rectangle(window, 0, window->height - case_sizeY, window->width, case_sizeY);
+    draw_text(window, scr, 0, window->height - case_sizeY);
     refresh_window(window);
-    SDL_Delay(5000);
+    SDL_Delay(2000);
     close_window(window);
 }
 
@@ -218,7 +218,7 @@ bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les a
                 return false;
             case SDLK_r: // reset
                 cout << "Reset" << endl;
-                game->statut = Pause;
+                game->statut = Statut(Pause);
                 init_game(game, pathMap);
                 return false;
             case SDLK_SPACE: // Pause

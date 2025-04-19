@@ -1,5 +1,4 @@
 #include "window.hpp"
-#include "window_audio.hpp"
 
 void set_color(SDL_Color *dst, int r, int g, int b, int a)
 {

@@ -13,7 +13,7 @@ ALL = $(EXE)
 obj/%.o: src/%.cpp src/%.hpp
 	$(CPP) $(CFLAGS) -c $< -o $@
 
-$(EXE): obj/game.o src/main.cpp
+$(EXE): obj/window_audio.o obj/window.o obj/world.o obj/game.o src/main.cpp
 	$(CPP) $(CFLAGS) $^ -o $@ $(LIBS)
 
 clean:

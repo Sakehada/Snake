@@ -1,9 +1,8 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 #include <iostream>
+#include "window.hpp"
 using namespace std;
-
-enum Block;
 
 struct World
 {

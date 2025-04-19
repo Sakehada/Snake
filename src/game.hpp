@@ -4,7 +4,8 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <string>
-#include "enum.hpp"
+#include "world.hpp"
+
 using namespace std;
 
 struct World;
