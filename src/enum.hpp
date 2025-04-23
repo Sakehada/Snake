@@ -12,7 +12,7 @@ enum SoundType
     Music,
     Effect
 };
-/*
+
 enum BodyType
 {
     RBODY,
@@ -20,7 +20,7 @@ enum BodyType
     BBODY,
     HEAD
 };
-*/
+
 enum Block
 {
     Empty,
@@ -29,7 +29,7 @@ enum Block
     B,
     Star
 };
-/*
+
 enum Direction
 {
     HAUT,
@@ -37,7 +37,7 @@ enum Direction
     GAUCHE,
     DROITE
 };
-*/
+
 enum Statut
 {
     Play,
