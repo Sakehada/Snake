@@ -12,20 +12,36 @@ void init_game(Game *game, string filename)
 
 void move_snake(Window *window, Game *game)
 {
+    Block nextBlock;
     switch (game->snake.d)
     {
     case HAUT:
-        game->snake.head = game->snake.head - game->world->width;
+        game->snake.head -= game->world->width;
+        nextBlock = game->world->grid[game->snake.head - game->world->width];
         break;
     case BAS:
-        game->snake.head = game->snake.head + game->world->width;
+        game->snake.head += game->world->width;
+        nextBlock = game->world->grid[game->snake.head + game->world->width];
         break;
     case GAUCHE:
-        game->snake.head = game->snake.head - 1;
+        game->snake.head -= 1;
+        nextBlock = game->world->grid[game->snake.head - 1];
         break;
     case DROITE:
-        game->snake.head = game->snake.head + 1;
+        game->snake.head += 1;
+        nextBlock = game->world->grid[game->snake.head + 1];
         break;
+    }
+
+    switch(nextBlock){
+        case R:           
+            break;
+        case G:
+            break;
+        case B:
+            break;
+        case Star:
+            break;
     }
 }
 

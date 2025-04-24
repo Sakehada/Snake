@@ -25,6 +25,7 @@ struct Snake
     Direction d;
     Body *queue;
     Body *neck;
+    bool manger;
 };
 
 struct Game
@@ -33,6 +34,7 @@ struct Game
     Snake snake;
     int score;
     Statut statut;
+    
 };
 
 void init_game(Game *game, string filename);
