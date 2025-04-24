@@ -2,8 +2,7 @@
 // info7 Snake
 
 // include
-#include <cmath>
-#include <random>
+
 #include "game.hpp"
 
 using namespace std;
@@ -13,6 +12,7 @@ int main(int argc, char **argv)
     Game game;
     Window window;
     string pathMap = "./assets/map/world2.dat";
+    bool quit = false; // quitte le jeu si true
     init_game(&game, pathMap);
     cout << game.snake.d << endl;
     cout << game.snake.head;
@@ -34,14 +34,16 @@ int main(int argc, char **argv)
     SDL_Texture *BodyGreen = load_image(&window, "./assets/sprite/body_green.png");
     SDL_Texture *BodyBlue = load_image(&window, "./assets/sprite/body_blue.png");
     SDL_Texture *TextureBackground[5] = {BackgroundTux, FoodRed, FoodGreen, FoodBlue, FoodStar};
-    SDL_Texture *TextureHead[8] = {HeadDownClose, HeadLeftClose, HeadUpClose, HeadRightClose, HeadDownOpen, HeadLeftOpen, HeadUpOpen, HeadRightOpen};
+    SDL_Texture *TextureHead[8] = {HeadUpClose, HeadDownClose, HeadLeftClose, HeadRightClose, HeadUpOpen, HeadDownOpen, HeadLeftOpen, HeadRightOpen};
     SDL_Texture *TextureBody[3] = {BodyRed, BodyGreen, BodyBlue};
-    game.snake.d = BAS;
-    for (int i = 0; i < 5; i++)
+    while (!quit)
     {
+        quit = keyboard_event(&game, &window, pathMap);
+        display_game(&window, &game, TextureBackground, TextureHead, TextureBody);
         move_snake(&window, &game);
-        display_game(&window, &game, TextureBackground, TextureHead);
+        SDL_Delay(500);
     }
+
     close_window(&window);
     return 0;
 }
