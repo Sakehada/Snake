@@ -34,10 +34,11 @@ struct Game
     Snake snake;
     int score;
     Statut statut;
-    
+    int directions[4];
 };
 
 void init_game(Game *game, string filename);
+void feed(Game *game, BodyType type);
 void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8]);
 void move_snake(Window *window, Game *game);
 void change_statut(Statut *statut);

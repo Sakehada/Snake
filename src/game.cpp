@@ -8,41 +8,22 @@ void init_game(Game *game, string filename)
     game->statut = Begin;
     game->snake.head = (game->world->height / 2) * game->world->width + game->world->width / 2; // On place le Snake au milieu de la grille
     game->snake.d = HAUT;                                                                       // Par defaut il va vers le haut
+    game->snake.neck = new Body;
+    game->snake.neck->pos = -1;
+    game->snake.queue = game->snake.neck;
+    game->snake.queue->pos = -1;
+    game->directions[0] = -game->world->width;
+    game->directions[1] = game->world->width;
+    game->directions[2] = -1;
+    game->directions[3] = 1;
 }
 
 void move_snake(Window *window, Game *game)
 {
     Block nextBlock;
-    switch (game->snake.d)
-    {
-    case HAUT:
-        game->snake.head -= game->world->width;
-        nextBlock = game->world->grid[game->snake.head - game->world->width];
-        break;
-    case BAS:
-        game->snake.head += game->world->width;
-        nextBlock = game->world->grid[game->snake.head + game->world->width];
-        break;
-    case GAUCHE:
-        game->snake.head -= 1;
-        nextBlock = game->world->grid[game->snake.head - 1];
-        break;
-    case DROITE:
-        game->snake.head += 1;
-        nextBlock = game->world->grid[game->snake.head + 1];
-        break;
-    }
-
-    switch(nextBlock){
-        case R:           
-            break;
-        case G:
-            break;
-        case B:
-            break;
-        case Star:
-            break;
-    }
+    int pos;
+    pos = game->snake.head + game->directions[game->snake.d];
+    feed(game, game->world->grid[pos], pos);
 }
 
 void change_statut(Statut *statut)
@@ -120,6 +101,20 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     draw_text(window, scr, 0, window->height - case_sizeY);
     refresh_window(window);
     SDL_Delay(1000);
+}
+
+void feed(Game *game, BodyType type, Direction pos){
+    Body* a = new Body;
+    a->type = type;  
+    a->pos = game->snake.head;
+    game->snake.head = pos;
+    game->snake.queue =
+    Body* temp = game->snake.neck;
+    int i = abs(game->snake.neck.pos - game->snake.head.pos);
+    for(int j = 0; j < i; j++){
+        temp = temp->previous;
+
+    }
 }
 
 bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les actions du clavier

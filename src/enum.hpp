@@ -17,8 +17,7 @@ enum BodyType
 {
     RBODY,
     GBODY,
-    BBODY,
-    HEAD
+    BBODY
 };
 
 enum Block
