@@ -56,15 +56,11 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     int case_sizeX = window->width / game->world->width;
     int case_sizeY = window->height / game->world->height;
     set_color(&window->background, 255, 255, 255, 255);
-    // On dessine le background
+
     for (int i = 0; i < game->world->width * game->world->height; i++)
     {
-        draw_texture(window, BackGround[0], (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-    }
-    // On dessine les pastilles
-    for (int i = 0; i < game->world->width * game->world->height; i++)
-    {
-        switch (game->world->grid[i])
+        draw_texture(window, BackGround[0], (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY); // On dessine le background
+        switch (game->world->grid[i])                                                                                                              // On dessine les pastilles
         {
         case Statut(R):
             draw_texture(window, BackGround[1], (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
