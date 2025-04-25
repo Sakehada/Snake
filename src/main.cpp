@@ -34,13 +34,13 @@ int main(int argc, char **argv)
     SDL_Texture *BodyGreen = load_image(&window, "./assets/sprite/body_green.png");
     SDL_Texture *BodyBlue = load_image(&window, "./assets/sprite/body_blue.png");
     SDL_Texture *TextureBackground[5] = {BackgroundTux, FoodRed, FoodGreen, FoodBlue, FoodStar};
-    SDL_Texture *TextureHead[8] = {HeadDownClose, HeadLeftClose, HeadUpClose, HeadRightClose, HeadDownOpen, HeadLeftOpen, HeadUpOpen, HeadRightOpen};
+    SDL_Texture *TextureHead[8] = {HeadUpClose, HeadDownClose, HeadLeftClose, HeadRightClose, HeadUpOpen, HeadDownOpen, HeadLeftOpen, HeadRightOpen};
     SDL_Texture *TextureBody[3] = {BodyRed, BodyGreen, BodyBlue};
     game.snake.d = BAS;
     for (int i = 0; i < 5; i++)
     {
         move_snake(&window, &game);
-        display_game(&window, &game, TextureBackground, TextureHead);
+        display_game(&window, &game, TextureBackground, TextureHead, TextureBody);
     }
     close_window(&window);
     return 0;

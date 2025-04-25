@@ -13,8 +13,8 @@ struct Window;
 
 struct Body
 {
-    Body *next;
-    Body *previous;
+    Body *next = nullptr;
+    Body *previous = nullptr;
     int *pos;
     BodyType type;
 };
@@ -38,8 +38,8 @@ struct Game
 };
 
 void init_game(Game *game, string filename);
-void feed(Game *game, BodyType type);
-void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8]);
+void feed(Game *game, BodyType type, int pos);
+void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *BodyTexture[3]);
 void move_snake(Window *window, Game *game);
 void change_statut(Statut *statut);
 bool keyboard_event(Game *game, Window *window, string pathMap);

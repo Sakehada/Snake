@@ -23,10 +23,10 @@ enum BodyType
 
 enum Block
 {
-    Empty,
     R,
     G,
     B,
+    Empty,
     Star
 };
 

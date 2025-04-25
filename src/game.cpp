@@ -19,10 +19,28 @@ void init_game(Game *game, string filename)
 
 void move_snake(Window *window, Game *game)
 {
-    Block nextBlock;
-    int pos;
-    pos = game->snake.head + game->directions[game->snake.d];
-    feed(game, game->world->grid[pos], pos);
+    int pos = game->snake.head + game->directions[game->snake.d]; 
+    if(pos < game->world->width * game->world->height){  
+        Body* temp = game->snake.queue;
+        switch(game->world->grid[pos]){
+            case Empty:           
+                while(temp->next != nullptr){
+                    *temp->pos = *temp->next->pos;
+                    temp = temp->next;
+                }
+                *temp->pos = game->snake.head;
+                game->snake.head = pos;
+                return;
+            case Star: 
+                return;
+            default:
+                feed(game, (BodyType)game->world->grid[pos], pos);
+                break;
+        }     
+    }
+    else{
+        // GAME OVER
+    }
 }
 
 void change_statut(Statut *statut)
@@ -46,7 +64,7 @@ void change_statut(Statut *statut)
     }
 }
 
-void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8])
+void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *BodyTexture[3])
 { // réinitialise le contenu de la fenetre, dessine la map, le snake puis rafraichit la fenetre
     clear_window(window);
     int case_sizeX = window->width / game->world->width;
@@ -75,24 +93,22 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
         }
     }
 
-    // on dessine le snake
-    switch (game->snake.d)
-    {
-    case HAUT:
-        draw_texture(window, HeadTexture[2], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        break;
-    case BAS:
-        draw_texture(window, HeadTexture[0], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        break;
-    case GAUCHE:
-        draw_texture(window, HeadTexture[1], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        break;
-    case DROITE:
-        draw_texture(window, HeadTexture[4], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        break;
-    default:
-        break;
+    switch(game->snake.manger){
+        case true:
+            draw_texture(window, HeadTexture[game->snake.d + 4], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);     
+            break;
+        case false:
+            draw_texture(window, HeadTexture[game->snake.d], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
+            break;
     }
+
+    Body* temp = game->snake.neck;
+    if(temp->type != NBODY){
+        while(temp != nullptr){
+            draw_texture(window, BodyTexture[temp->type], (*temp->pos % game->world->width * case_sizeX), (*temp->pos / game->world->width * case_sizeY), case_sizeX, case_sizeY);
+            temp = temp->previous;
+        }
+    }    
 
     set_color(&window->foreground, 0, 0, 0, 255);
     string scr = "Score:" + to_string(game->score);
@@ -102,18 +118,14 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     SDL_Delay(1000);
 }
 
-void feed(Game *game, BodyType type, Direction pos){
+void feed(Game *game, BodyType type, int pos){
     Body* a = new Body;
     a->type = type;  
-    a->pos = game->snake.head;
+    *a->pos = game->snake.head;
+    a->previous = game->snake.neck;
+    game->snake.neck->next = a;
+    game->snake.neck = a;
     game->snake.head = pos;
-    game->snake.queue =
-    Body* temp = game->snake.neck;
-    int i = abs(game->snake.neck.pos - game->snake.head.pos);
-    for(int j = 0; j < i; j++){
-        temp = temp->previous;
-
-    }
 }
 
 bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les actions du clavier
