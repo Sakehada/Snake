@@ -9,9 +9,8 @@ void init_game(Game *game, string filename)
     game->snake.head = (game->world->height / 2) * game->world->width + game->world->width / 2; // On place le Snake au milieu de la grille
     game->snake.d = HAUT;                                                                       // Par defaut il va vers le haut
     game->snake.neck = new Body;
-    game->snake.neck->pos = -1;
+    game->snake.neck->type = NBODY;
     game->snake.queue = game->snake.neck;
-    game->snake.queue->pos = -1;
     game->directions[0] = -game->world->width;
     game->directions[1] = game->world->width;
     game->directions[2] = -1;
