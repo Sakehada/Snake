@@ -36,12 +36,12 @@ int main(int argc, char **argv)
     SDL_Texture *TextureBackground[5] = {BackgroundTux, FoodRed, FoodGreen, FoodBlue, FoodStar};
     SDL_Texture *TextureHead[8] = {HeadUpClose, HeadDownClose, HeadLeftClose, HeadRightClose, HeadUpOpen, HeadDownOpen, HeadLeftOpen, HeadRightOpen};
     SDL_Texture *TextureBody[3] = {BodyRed, BodyGreen, BodyBlue};
-    while (!quit)
+    int delay = 200;
+    while(!(keyboard_event(&game, &window, pathMap)))
     {
-        quit = keyboard_event(&game, &window, pathMap);
-        display_game(&window, &game, TextureBackground, TextureHead, TextureBody);
-        move_snake(&window, &game);
-        SDL_Delay(500);
+        move_snake(&window, &game, &delay);
+        display_game(&window, &game, TextureBackground, TextureHead, TextureBody, delay);
+        if(delay < 200){delay += 10;}
     }
 
     close_window(&window);
