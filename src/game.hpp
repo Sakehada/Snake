@@ -39,8 +39,8 @@ struct Game
 
 void init_game(Game *game, string filename);
 void feed(Game *game, BodyType type, int pos);
-void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *BodyTexture[3]);
-void move_snake(Window *window, Game *game);
+void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *BodyTexture[3], int delay);
+void move_snake(Window *window, Game *game, int* delay);
 void change_statut(Statut *statut);
 bool keyboard_event(Game *game, Window *window, string pathMap);
 #endif

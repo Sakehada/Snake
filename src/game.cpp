@@ -17,12 +17,15 @@ void init_game(Game *game, string filename)
     game->directions[3] = 1;
 }
 
-void move_snake(Window *window, Game *game)
+void move_snake(Window *window, Game *game, int* delay)
 {
     int pos = game->snake.head + game->directions[game->snake.d]; 
     if(pos < game->world->width * game->world->height){  
         Body* temp = game->snake.queue;
         switch(game->world->grid[pos]){
+            case Star: 
+                *delay = 100;
+                game->world->grid[pos] = Empty;
             case Empty:           
                 while(temp->next != nullptr){
                     temp->pos = temp->next->pos;
@@ -30,8 +33,6 @@ void move_snake(Window *window, Game *game)
                 }
                 temp->pos = game->snake.head;
                 game->snake.head = pos;
-                return;
-            case Star: 
                 return;
             default:
                 feed(game, (BodyType)game->world->grid[pos], pos);
@@ -64,7 +65,7 @@ void change_statut(Statut *statut)
     }
 }
 
-void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *BodyTexture[3])
+void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *BodyTexture[3], int delay)
 { // réinitialise le contenu de la fenetre, dessine la map, le snake puis rafraichit la fenetre
     clear_window(window);
     int case_sizeX = window->width / game->world->width;
@@ -115,7 +116,7 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     draw_fill_rectangle(window, 0, window->height - case_sizeY, window->width, case_sizeY);
     draw_text(window, scr, 0, window->height - case_sizeY);
     refresh_window(window);
-    SDL_Delay(1000);
+    SDL_Delay(delay);
 }
 
 void feed(Game *game, BodyType type, int pos){
@@ -126,6 +127,7 @@ void feed(Game *game, BodyType type, int pos){
     game->snake.neck->next = a;
     game->snake.neck = a;
     game->snake.head = pos;
+    game->world->grid[pos] = Empty;
 }
 
 bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les actions du clavier
@@ -139,7 +141,6 @@ bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les a
             switch (key_event.keysym.sym)
             {
             case SDLK_q: // pour quitter
-                cout << "q" << endl;
                 return true;
             case SDLK_m: // mute la musique
                 mute_audio_type(window->mixer, 1);
