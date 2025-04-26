@@ -17,4 +17,5 @@ void write(World *world, int x, int y, Block b);
 void display(World *world);
 void init_world_from_file(World *word, string filename);
 int getId(int x, int y, int w);
+void FoodPlacement(World *world);
 #endif

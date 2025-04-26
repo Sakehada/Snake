@@ -5,6 +5,8 @@
 #include <SDL2/SDL.h>
 #include <string>
 #include "world.hpp"
+#include <cmath>
+#include <random>
 
 using namespace std;
 
@@ -15,7 +17,7 @@ struct Body
 {
     Body *next;
     Body *previous;
-    int *pos;
+    int pos;
     BodyType type;
 };
 
@@ -38,7 +40,7 @@ struct Game
 };
 
 void init_game(Game *game, string filename);
-void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8]);
+void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *TextureBody[3]);
 void move_snake(Window *window, Game *game);
 void change_statut(Statut *statut);
 bool keyboard_event(Game *game, Window *window, string pathMap);

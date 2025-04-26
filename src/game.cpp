@@ -4,10 +4,14 @@ void init_game(Game *game, string filename)
 { // Initie la partie, y compris le monde
     game->world = new World;
     init_world_from_file(game->world, filename);
+    FoodPlacement(game->world);
     game->score = 0;
     game->statut = Begin;
     game->snake.head = (game->world->height / 2) * game->world->width + game->world->width / 2; // On place le Snake au milieu de la grille
-    game->snake.d = HAUT;                                                                       // Par defaut il va vers le haut
+    game->snake.d = HAUT;
+    game->snake.manger = 0; // Par defaut il va vers le haut
+    game->snake.neck = NULL;
+    game->snake.queue = NULL;
 }
 
 void move_snake(Window *window, Game *game)
@@ -66,7 +70,7 @@ void change_statut(Statut *statut)
     }
 }
 
-void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8])
+void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *TextureBody[3])
 { // réinitialise le contenu de la fenetre, dessine la map, le snake puis rafraichit la fenetre
     clear_window(window);
     int case_sizeX = window->width / game->world->width;
@@ -96,22 +100,16 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     }
 
     // on dessine le snake
-    switch (game->snake.d)
+    // La Tete
+    int i = 0;
+    if (game->snake.manger)
+        i += 4;
+    draw_texture(window, HeadTexture[game->snake.d + i], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
+    // Le corps
+    Body *ptr = game->snake.neck;
+    while (ptr != NULL)
     {
-    case HAUT:
-        draw_texture(window, HeadTexture[2], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        break;
-    case BAS:
-        draw_texture(window, HeadTexture[0], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        break;
-    case GAUCHE:
-        draw_texture(window, HeadTexture[1], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        break;
-    case DROITE:
-        draw_texture(window, HeadTexture[4], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-        break;
-    default:
-        break;
+        draw_texture(window, TextureBody[ptr->type], (ptr->pos % game->world->width * case_sizeX), (ptr->pos / game->world->width * case_sizeY), case_sizeX, case_sizeY);
     }
 
     set_color(&window->foreground, 0, 0, 0, 255);
@@ -119,7 +117,6 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     draw_fill_rectangle(window, 0, window->height - case_sizeY, window->width, case_sizeY);
     draw_text(window, scr, 0, window->height - case_sizeY);
     refresh_window(window);
-    SDL_Delay(1000);
 }
 
 bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les actions du clavier

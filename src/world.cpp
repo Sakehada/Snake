@@ -117,3 +117,64 @@ void init_world_from_file(World *world, string filename)
         cout << "impossible de lire le fichier : " << filename << endl;
     }
 }
+
+void FoodPlacement(World *world)
+{
+    bool r = 0, g = 0, b = 0, s = 0;
+    for (int i = 0; i < world->width * world->height; i++)
+    {
+        switch (world->grid[i])
+        {
+        case R:
+            r = 1;
+            break;
+        case G:
+            g = 1;
+            break;
+        case B:
+            b = 1;
+            break;
+        case Star:
+            s = 1;
+            break;
+        default:
+            break;
+        }
+    }
+    if (r == 0)
+    {
+        int i = rand() % (world->height * world->width);
+        while (world->grid[i] != Empty)
+        {
+            i = (i + i) % (world->height * world->width);
+        }
+        world->grid[i] = R;
+    }
+    if (b == 0)
+    {
+        int i = rand() % (world->height * world->width);
+        while (world->grid[i] != Empty)
+        {
+            i = (i + i) % (world->height * world->width);
+        }
+        world->grid[i] = B;
+    }
+    if (g == 0)
+    {
+        int i = rand() % (world->height * world->width);
+        while (world->grid[i] != Empty)
+        {
+            i = (i + i) % (world->height * world->width);
+        }
+        world->grid[i] = G;
+    }
+    if (s == 0)
+    {
+        int i = rand() % (world->height * world->width);
+        while (world->grid[i] != Empty)
+        {
+            i = (i + i) % (world->height * world->width);
+        }
+        world->grid[i] = Star;
+    }
+}
