@@ -15,7 +15,7 @@ struct Body
 {
     Body *next = nullptr;
     Body *previous = nullptr;
-    int *pos;
+    int pos;
     BodyType type;
 };
 

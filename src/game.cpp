@@ -7,7 +7,7 @@ void init_game(Game *game, string filename)
     game->score = 0;
     game->statut = Begin;
     game->snake.head = (game->world->height / 2) * game->world->width + game->world->width / 2; // On place le Snake au milieu de la grille
-    game->snake.d = HAUT;                                                                       // Par defaut il va vers le haut
+    game->snake.d = HAUT;                                                                   // Par defaut il va vers le haut
     game->snake.neck = new Body;
     game->snake.neck->type = NBODY;
     game->snake.queue = game->snake.neck;
@@ -25,10 +25,10 @@ void move_snake(Window *window, Game *game)
         switch(game->world->grid[pos]){
             case Empty:           
                 while(temp->next != nullptr){
-                    *temp->pos = *temp->next->pos;
+                    temp->pos = temp->next->pos;
                     temp = temp->next;
                 }
-                *temp->pos = game->snake.head;
+                temp->pos = game->snake.head;
                 game->snake.head = pos;
                 return;
             case Star: 
@@ -105,7 +105,7 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     Body* temp = game->snake.neck;
     if(temp->type != NBODY){
         while(temp != nullptr){
-            draw_texture(window, BodyTexture[temp->type], (*temp->pos % game->world->width * case_sizeX), (*temp->pos / game->world->width * case_sizeY), case_sizeX, case_sizeY);
+            draw_texture(window, BodyTexture[temp->type], (temp->pos % game->world->width * case_sizeX), (temp->pos / game->world->width * case_sizeY), case_sizeX, case_sizeY);
             temp = temp->previous;
         }
     }    
@@ -121,7 +121,7 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
 void feed(Game *game, BodyType type, int pos){
     Body* a = new Body;
     a->type = type;  
-    *a->pos = game->snake.head;
+    a->pos = game->snake.head;
     a->previous = game->snake.neck;
     game->snake.neck->next = a;
     game->snake.neck = a;
