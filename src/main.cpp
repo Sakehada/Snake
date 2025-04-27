@@ -11,12 +11,10 @@ int main(int argc, char **argv)
 {
     Game game;
     Window window;
-    string pathMap = "./assets/map/world2.dat";
+    string pathMapNewGame = "./assets/map/world2.dat";
     bool quit = false; // quitte le jeu si true
-    init_game(&game, pathMap);
-    cout << game.snake.d << endl;
-    cout << game.snake.head;
     init_window(&window, 1000, 800, "Snake");
+    game.statut = Begin;
     SDL_Texture *FoodRed = load_image(&window, "./assets/sprite/food_red.png");
     SDL_Texture *FoodBlue = load_image(&window, "./assets/sprite/food_blue.png");
     SDL_Texture *FoodGreen = load_image(&window, "./assets/sprite/food_green.png");
@@ -37,11 +35,116 @@ int main(int argc, char **argv)
     SDL_Texture *TextureHead[8] = {HeadUpClose, HeadDownClose, HeadLeftClose, HeadRightClose, HeadUpOpen, HeadDownOpen, HeadLeftOpen, HeadRightOpen};
     SDL_Texture *TextureBody[3] = {BodyRed, BodyGreen, BodyBlue};
     int delay = 200;
-    while(!(keyboard_event(&game, &window, pathMap)))
+    int counter;
+    bool select;
+    counter = 1;
+    select = false;
+    // game.statut = GameOver;
+    while (!quit)
     {
-        move_snake(&window, &game, &delay);
-        display_game(&window, &game, TextureBackground, TextureHead, TextureBody, delay);
-        if(delay < 200){delay += 10;}
+        switch (game.statut)
+        {
+        case Begin:
+
+            clear_window(&window);
+            set_color(&window.foreground, 250, 250, 250, 250);
+            set_color(&window.background, 0, 0, 0, 250);
+            draw_text(&window, "-->", (window.width / 3) - 40, counter * window.height / 3);
+            draw_text(&window, "New game", window.width / 3, window.height / 3);
+            draw_text(&window, "Load game", window.width / 3, 2 * window.height / 3);
+            draw_text(&window, "Q pour quitter, Haut/bas curseur, f Select, r= reset", 0, window.height - 25);
+            refresh_window(&window);
+            quit = keyboard_eventBegin(&game, &window, &counter, &select); // regarde les actions du clavier
+            if (select == 1)
+            {
+                switch (counter)
+                {
+                case 1:
+                    init_game(&game, pathMapNewGame);
+                    game.statut = Play;
+                    break;
+                case 2:
+
+                    game.statut = Load;
+                    select = false;
+                    counter = 1;
+                    break;
+                }
+            }
+            break;
+
+        case Load:
+
+            clear_window(&window);
+            delay = 200;
+            set_color(&window.foreground, 250, 250, 250, 250);
+            set_color(&window.background, 0, 0, 0, 250);
+            draw_text(&window, "-->", (window.width / 3) - 40, counter * window.height / 5);
+            draw_text(&window, "Game 1", window.width / 3, window.height / 5);
+            draw_text(&window, "Game 2", window.width / 3, 2 * window.height / 5);
+            draw_text(&window, "Game 3", window.width / 3, 3 * window.height / 5);
+            draw_text(&window, "Game 4", window.width / 3, 4 * window.height / 5);
+            refresh_window(&window);
+            quit = keyboard_eventLoad(&game, &window, &counter, &select);
+            if (select == 1)
+            {
+                switch (counter)
+                {
+                case 1:
+                    load_game(&game, "./assets/map/Save1.txt");
+                    cout << "Direction: " << game.directions << endl;
+                    cout << "Score: " << game.score << endl;
+                    cout << "Direction: " << game.statut << endl;
+                    game.statut = Play;
+                    break;
+                case 2:
+                    load_game(&game, "./assets/map/Save2.txt");
+                    game.statut = Play;
+                    break;
+                case 3:
+                    load_game(&game, "./assets/map/Save3.txt");
+                    game.statut = Play;
+                    break;
+                case 4:
+                    load_game(&game, "./assets/map/Save4.txt");
+                    game.statut = Play;
+                    break;
+                }
+            }
+            break;
+
+        case Play:
+            clear_window(&window);
+            move_snake(&window, &game, &delay);
+            display_game(&window, &game, TextureBackground, TextureHead, TextureBody, delay);
+            quit = keyboard_event(&game, &window, pathMapNewGame);
+            delay += 10;
+            cout << game.snake.head << endl;
+            break;
+
+        case GameOver:
+            clear_window(&window);
+            draw_text(&window, "Game Over", (window.width / 3) - 40, window.height / 5);
+            draw_text(&window, "Votre score: " + game.score, (window.width / 3) - 40, window.height / 5);
+            draw_text(&window, "R pour recommencer", (window.width / 3) - 40, 3 * window.height / 5);
+            draw_text(&window, "Q pour quitter", (window.width / 3) - 40, 4 * window.height / 5);
+            refresh_window(&window);
+            quit = keyboard_eventGameOver(&game, &window);
+            break;
+
+        case Pause:
+            draw_text(&window, "Load menu = l", (window.width / 3) - 40, window.height / 5);
+            draw_text(&window, "R pour recommencer", (window.width / 3) - 40, 2 * window.height / 5);
+            refresh_window(&window);
+            SDL_Delay(10);
+            quit = keyboard_event(&game, &window, pathMapNewGame);
+            counter = 1;
+            select = false;
+            break;
+
+        default:
+            break;
+        }
     }
 
     close_window(&window);

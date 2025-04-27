@@ -1,10 +1,9 @@
 #include "game.hpp"
 
-void init_game(Game *game, string filename)
-{ // Initie la partie, y compris le monde
+void init_game(Game *game, string filename) // New game
+{                                           // Initie la partie, y compris le monde
     game->world = new World;
     init_world_from_file(game->world, filename);
-    FoodPlacement(game->world);
     game->score = 0;
     game->statut = Begin;
     game->snake.head = (game->world->height / 2) * game->world->width + game->world->width / 2; // On place le Snake au milieu de la grille
@@ -18,29 +17,215 @@ void init_game(Game *game, string filename)
     game->directions[3] = 1;
 }
 
-void move_snake(Window *window, Game *game, int* delay)
+void load_game(Game *game, string filename)
 {
-    int pos = game->snake.head + game->directions[game->snake.d]; 
-    if(pos < game->world->width * game->world->height){  
-        Body* temp = game->snake.queue;
-        switch(game->world->grid[pos]){
-            case Star: 
-                *delay = 100;
-                game->world->grid[pos] = Empty;
-            case Empty:           
-                while(temp->next != nullptr){
-                    temp->pos = temp->next->pos;
-                    temp = temp->next;
+    game->world = new World;
+
+    cout << "etape 1" << endl;
+    ifstream fic(filename.c_str());
+    if (fic)
+    {
+        fic >> game->world->width;
+        fic >> game->world->height;
+
+        init_world(game->world, game->world->width, game->world->height);
+        cout << "etape 2" << endl;
+        string line;
+        for (int i = 0; i < game->world->height; i++)
+        {
+            fic >> line;
+            Block b;
+            for (int k = 0; k < game->world->width; k++)
+            {
+
+                switch (line[k])
+                {
+                case '.':
+                    b = Empty;
+                    break;
+                case 'R':
+                    b = R;
+                    break;
+                case 'G':
+                    b = G;
+                    break;
+                case 'B':
+                    b = B;
+                    break;
+                case 'S':
+                    b = Star;
+                    break;
+                default:
+                    cout << "Erreur de lecture de la map: " << line[k] << endl;
+                    return;
+                    break;
                 }
-                temp->pos = game->snake.head;
-                game->snake.head = pos;
-                return;
-            default:
-                feed(game, (BodyType)game->world->grid[pos], pos);
+                write(game->world, k, i, b);
+            }
+        }
+        game->directions[0] = -game->world->width;
+        game->directions[1] = game->world->width;
+        game->directions[2] = -1;
+        game->directions[3] = 1;
+        game->statut = Play;
+        cout << "etape 3" << endl;
+        fic >> game->score; // on prend le score
+        cout << "etape 4" << endl;
+        fic >> game->snake.head; // On prend la position de la tete
+        cout << "etape 5" << endl;
+        game->snake.d = HAUT; // On met par defaut la position haut
+        cout << "etape 6" << endl;
+        game->statut = Play;
+        cout << "etape 7" << endl;
+        int taille;
+        char Type;
+        fic >> taille; // On prend la taille du snake
+        cout << taille;
+        Body *ptrcurrent = game->snake.neck;
+        cout << "etape 8" << endl;
+        ptrcurrent = new Body;
+        cout << "etape 9" << endl;
+        for (int i = 0; i < taille; i++) // Pour le nombre de Body du snake
+        {
+            cout << i + "etape" << endl;
+            // On alloue de la memoire
+            cout << i + "etape 1" << endl;
+            if (i == 0) // Si c est le 1er element il devient le neck
+            {
+                game->snake.neck = ptrcurrent;
+                cout << i + "etape 2" << endl;
+                ptrcurrent->previous = NULL;
+            }
+            fic >> ptrcurrent->pos; // On prend la position du body
+            cout << i + "etape 3" << endl;
+            fic >> Type; // On prend le type du body
+            switch (Type)
+            {
+            case 'R':
+                ptrcurrent->type = RBODY;
                 break;
-        }     
+            case 'G':
+                ptrcurrent->type = GBODY;
+                break;
+            case 'B':
+                ptrcurrent->type = BBODY;
+                break;
+            case 'N':
+                ptrcurrent->type = NBODY;
+                break;
+            }
+            cout << i + "etape 4" << endl;
+
+            Body *ptrPrevious = ptrcurrent;
+            ptrcurrent->next = new Body;
+            ptrcurrent = ptrcurrent->next;
+            ptrcurrent->previous = ptrPrevious;
+            cout << i + "etape 5" << endl;
+        }
+        game->snake.queue = ptrcurrent;
+        cout << "etape 6" << endl;
     }
-    else{
+    else
+    {
+        cout << "impossible de lire le fichier : " << filename << endl;
+    }
+}
+
+void save_game(Game *game, string pathSave)
+{
+    // sauvegarde du monde
+    cout << game->world->width << endl;
+    cout << game->world->height << endl;
+    for (int i = 0; i < game->world->height * game->world->width; i++)
+    {
+        if (i != 0 && i % (game->world->width) == 0)
+        {
+            cout << endl;
+        }
+        switch (game->world->grid[i])
+        {
+        case Empty:
+            cout << '.';
+            break;
+        case R:
+            cout << 'R';
+            break;
+        case G:
+            cout << 'G';
+            break;
+        case B:
+            cout << 'B';
+            break;
+        case Star:
+            cout << 'S';
+            break;
+
+        default:
+            break;
+        }
+    }
+    cout << endl;
+    cout << game->score << endl;      // sauvegarde le score
+    cout << game->snake.head << endl; // l'emplacement de tete
+    int count = 0;
+    Body *ptr = game->snake.neck;
+    while (ptr != NULL) // Compte il y a de body
+    {
+        count++;
+        ptr = ptr->next;
+    }
+    cout << count << endl;
+    ptr = game->snake.neck;
+    for (int i = 0; i < count; i++) // Pour chaque body
+    {
+        cout << ptr->pos << endl;
+        switch (ptr->type)
+        {
+        case NBODY:
+            cout << 'N' << endl;
+            break;
+        case RBODY:
+            cout << 'R' << endl;
+            break;
+        case GBODY:
+            cout << 'G' << endl;
+            break;
+        case BBODY:
+            cout << 'B' << endl;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void move_snake(Window *window, Game *game, int *delay)
+{
+    int pos = game->snake.head + game->directions[game->snake.d];
+    if (pos < game->world->width * game->world->height)
+    {
+        Body *temp = game->snake.queue;
+        switch (game->world->grid[pos])
+        {
+        case Star:
+            *delay = 100;
+            game->world->grid[pos] = Empty;
+        case Empty:
+            while (temp->next != nullptr)
+            {
+                temp->pos = temp->next->pos;
+                temp = temp->next;
+            }
+            temp->pos = game->snake.head;
+            game->snake.head = pos;
+            return;
+        default:
+            feed(game, (BodyType)game->world->grid[pos], pos);
+            break;
+        }
+    }
+    else
+    {
         // GAME OVER
     }
 }
@@ -58,8 +243,6 @@ void change_statut(Statut *statut)
     case Pause:
         *statut = Statut(Play);
         break;
-    case Win:
-        *statut = Statut(Begin);
     case GameOver:
         *statut = Statut(Begin);
         break;
@@ -104,13 +287,15 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
             break;
     }
 
-    Body* temp = game->snake.neck;
-    if(temp->type != NBODY){
-        while(temp != nullptr){
+    Body *temp = game->snake.neck;
+    if (temp->type != NBODY)
+    {
+        while (temp != nullptr)
+        {
             draw_texture(window, BodyTexture[temp->type], (temp->pos % game->world->width * case_sizeX), (temp->pos / game->world->width * case_sizeY), case_sizeX, case_sizeY);
             temp = temp->previous;
         }
-    }    
+    }
 
     set_color(&window->foreground, 0, 0, 0, 255);
     string scr = "Score:" + to_string(game->score);
@@ -120,9 +305,10 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     SDL_Delay(delay);
 }
 
-void feed(Game *game, BodyType type, int pos){
-    Body* a = new Body;
-    a->type = type;  
+void feed(Game *game, BodyType type, int pos)
+{
+    Body *a = new Body;
+    a->type = type;
     a->pos = game->snake.head;
     a->previous = game->snake.neck;
     game->snake.neck->next = a;
@@ -146,13 +332,14 @@ bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les a
             case SDLK_m: // mute la musique
                 mute_audio_type(window->mixer, 1);
                 return false;
-            case SDLK_s: // mute les bruits
-                mute_audio_type(window->mixer, 0);
+            case SDLK_s: // sauvegarde
+                save_game(game, "ol");
                 return false;
             case SDLK_r: // reset
-                cout << "Reset" << endl;
-                game->statut = Statut(Pause);
-                init_game(game, pathMap);
+                game->statut = Begin;
+                return false;
+            case SDLK_l: // oad menu
+                game->statut = Load;
                 return false;
             case SDLK_SPACE: // Pause
                 change_statut(&(game->statut));
@@ -170,6 +357,108 @@ bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les a
                 game->snake.d = BAS;
                 return false;
 
+            default:
+                return false;
+                break;
+            }
+        }
+    }
+    return false;
+}
+
+bool keyboard_eventBegin(Game *game, Window *window, int *counter, bool *select) // regarde les actions du clavier
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event) != 0)
+    {
+        if (event.type == SDL_KEYDOWN)
+        {
+            SDL_KeyboardEvent key_event = event.key;
+            switch (key_event.keysym.sym)
+            {
+            case SDLK_q: // pour quitter
+                return true;
+            case SDLK_f: // Selection
+                *select += 1;
+                return false;
+            case SDLK_UP:
+                if (*counter > 1)
+                {
+                    *counter -= 1;
+                }
+                return false;
+            case SDLK_DOWN:
+                if (*counter < 2)
+                {
+                    *counter += 1;
+                }
+                return false;
+
+            default:
+                return false;
+                break;
+            }
+        }
+    }
+    return false;
+}
+
+bool keyboard_eventLoad(Game *game, Window *window, int *counter, bool *select) // regarde les actions du clavier
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event) != 0)
+    {
+        if (event.type == SDL_KEYDOWN)
+        {
+            SDL_KeyboardEvent key_event = event.key;
+            switch (key_event.keysym.sym)
+            {
+            case SDLK_q: // pour quitter
+                return true;
+            case SDLK_f: // Selection
+                *select += 1;
+                return false;
+            case SDLK_r: // Selection
+                game->statut = Begin;
+                return false;
+            case SDLK_UP:
+                if (*counter > 1)
+                {
+                    *counter -= 1;
+                }
+                return false;
+            case SDLK_DOWN:
+                if (*counter < 4)
+                {
+                    *counter += 1;
+                }
+                return false;
+
+            default:
+                return false;
+                break;
+            }
+        }
+    }
+    return false;
+}
+
+bool keyboard_eventGameOver(Game *game, Window *window) // regarde les actions du clavier
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event) != 0)
+    {
+        if (event.type == SDL_KEYDOWN)
+        {
+            SDL_KeyboardEvent key_event = event.key;
+            switch (key_event.keysym.sym)
+            {
+            case SDLK_q: // pour quitter
+                return true;
+
+            case SDLK_r:
+                game->statut = Begin;
+                return false;
             default:
                 return false;
                 break;

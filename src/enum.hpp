@@ -43,6 +43,6 @@ enum Statut
     Play,
     Pause,
     Begin,
-    Win,
-    GameOver
+    GameOver,
+    Load
 };
