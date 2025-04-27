@@ -18,14 +18,18 @@ enum BodyType
     RBODY,
     GBODY,
     BBODY,
+<<<<<<< HEAD
+=======
+    NBODY
+>>>>>>> origin/anis
 };
 
 enum Block
 {
-    Empty,
     R,
     G,
     B,
+    Empty,
     Star
 };
 
