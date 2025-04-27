@@ -210,6 +210,26 @@ void move_snake(Window *window, Game *game, int *delay)
         case Star:
             *delay = 100;
             game->world->grid[pos] = Empty;
+            while(temp->next != nullptr){
+                if(temp->type == temp->next->type){
+                    if(temp->next->type == temp->next->next->type){
+                        for(int i = 0; i < 2; i++){
+                            if(temp == game->snake.queue){
+                                game->snake.queue = temp->next;
+                            }
+                            temp = temp->next;
+                            delete temp->previous;
+                        }
+                        return;
+                    }
+                    else{
+                        temp = temp->next->next;
+                    }
+                }else{
+                    temp = temp->next;
+                }
+            }
+            return;
         case Empty:
             while (temp->next != nullptr)
             {
