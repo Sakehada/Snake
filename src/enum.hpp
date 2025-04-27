@@ -18,10 +18,7 @@ enum BodyType
     RBODY,
     GBODY,
     BBODY,
-<<<<<<< HEAD
-=======
     NBODY
->>>>>>> origin/anis
 };
 
 enum Block
@@ -46,6 +43,6 @@ enum Statut
     Play,
     Pause,
     Begin,
-    Win,
-    GameOver
+    GameOver,
+    Load
 };

@@ -2,6 +2,7 @@
 #define WORLD_HPP
 #include <iostream>
 #include "window.hpp"
+#include <fstream>
 using namespace std;
 
 struct World
