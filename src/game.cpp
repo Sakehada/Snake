@@ -58,7 +58,6 @@ void load_game(Game *game, string filename)
                 default:
                     cout << "Erreur de lecture de la map: " << line[k] << endl;
                     return;
-                    break;
                 }
                 write(game->world, k, i, b);
             }
@@ -202,7 +201,7 @@ void save_game(Game *game, string pathSave)
 void move_snake(Window *window, Game *game, int *delay)
 {
     int pos = game->snake.head + game->directions[game->snake.d];
-    if (pos < game->world->width * game->world->height)
+    if (pos <= 0 && pos < game->world->width * game->world->height)
     {
         Body *temp = game->snake.queue;
         switch (game->world->grid[pos])
@@ -230,7 +229,7 @@ void move_snake(Window *window, Game *game, int *delay)
                 }
             }
             return;
-        case Empty:
+        case Empty: // SUSPECT N1
             while (temp->next != nullptr)
             {
                 temp->pos = temp->next->pos;
