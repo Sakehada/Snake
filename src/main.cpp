@@ -45,7 +45,6 @@ int main(int argc, char **argv)
         switch (game.statut)
         {
         case Begin:
-
             clear_window(&window);
             set_color(&window.foreground, 250, 250, 250, 250);
             set_color(&window.background, 0, 0, 0, 250);
@@ -64,7 +63,6 @@ int main(int argc, char **argv)
                     game.statut = Play;
                     break;
                 case 2:
-
                     game.statut = Load;
                     select = false;
                     counter = 1;
@@ -76,7 +74,6 @@ int main(int argc, char **argv)
         case Load:
 
             clear_window(&window);
-            delay = 200;
             set_color(&window.foreground, 250, 250, 250, 250);
             set_color(&window.background, 0, 0, 0, 250);
             draw_text(&window, "-->", (window.width / 3) - 40, counter * window.height / 5);
@@ -118,7 +115,9 @@ int main(int argc, char **argv)
             move_snake(&window, &game, &delay);
             display_game(&window, &game, TextureBackground, TextureHead, TextureBody, delay);
             quit = keyboard_event(&game, &window, pathMapNewGame);
-            delay += 10;
+            if(delay < 200){
+                delay += 10;
+            }        
             cout << game.snake.head << endl;
             break;
 
