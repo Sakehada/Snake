@@ -9,9 +9,9 @@ void init_game(Game *game, string filename) // New game
     game->snake.head = (game->world->height / 2) * game->world->width + game->world->width / 2; // On place le Snake au milieu de la grille
     game->snake.d = HAUT;                                                                       // Par defaut il va vers le haut
     game->snake.neck = new Body;
-    cout << "Neck:  " << game->snake.neck << endl;
     game->snake.neck->type = NBODY;
-    game->snake.queue = game->snake.neck;
+    game->snake.queue = new Body;
+    game->snake.queue->type = NBODY;
     game->directions[0] = -game->world->width;
     game->directions[1] = game->world->width;
     game->directions[2] = -1;
@@ -198,65 +198,92 @@ void save_game(Game *game, string pathSave)
         }
     }
 }
+
 void feed(Game *game, BodyType type, int pos)
 {
     Body *a = new Body;
     cout << "A " << a << endl;
     a->type = type;
-    a->pos = game->snake.head;
-    a->previous = game->snake.neck;
-    game->snake.neck->next = a;
-    game->snake.neck = a;
+    a->pos = game->snake.head;  
+    if(game->snake.queue->type == NBODY){
+        game->snake.queue = a;
+        game->snake.neck = a;
+    }else{
+        a->previous = game->snake.neck;
+        game->snake.neck->next = a;
+        game->snake.neck = a;
+    }    
     game->snake.head = pos;
     game->world->grid[pos] = Empty;
 }
+
 void move_snake(Window *window, Game *game, int *delay)
 {
     cout << "Debut move" << endl;
     int pos = game->snake.head + game->directions[game->snake.d];
     if (pos >= 0 && pos < game->world->width * game->world->height){
-        Body *temp = game->snake.queue;
+        Body *temp = game->snake.neck;
+        Body *temp2 = game->snake.queue;
         switch (game->world->grid[pos])
         {
         case Star:
             *delay = 100;
             game->world->grid[pos] = Empty;
-            while (temp->next != nullptr)
+            while (temp->previous != nullptr && temp->previous->previous != nullptr)
             {
-                if (temp->type == temp->next->type)
+                if (temp->type == temp->previous->type)
                 {
-                    if (temp->next->type == temp->next->next->type)
-                    {
-                        for (int i = 0; i < 2; i++)
-                        {
-                            if (temp == game->snake.queue)
-                            {
+                    if (temp->type == temp->previous->previous->type)
+                    {      
+                        if(temp->previous->previous->previous == nullptr){
+                            if(temp->next == nullptr){    
+                                Body* vide = new Body;
+                                vide->type = NBODY;                      
+                                game->snake.queue = vide;
+                                game->snake.neck = vide;
+                            }else{
                                 game->snake.queue = temp->next;
+                                game->snake.queue->previous = nullptr;
                             }
-                            temp = temp->next;
-                            delete temp->previous;
+                            
+                        }else{
+                            if(temp->next == nullptr){
+                                game->snake.neck = temp->previous->previous->previous;
+                                game->snake.neck->next = nullptr;
+                            }else{
+                                temp->next->previous = temp->previous->previous->previous;
+                                temp->previous->previous->previous->next = temp->next;
+                            }
                         }
+
+                        delete temp->previous->previous;
+                        delete temp->previous;
+                        delete temp;
+                        
+                        cout << "NECK " << game->snake.neck << " QUEUE " << game->snake.queue << endl;
                         return;
                     }
                     else
                     {
-                        temp = temp->next->next;
+                        temp = temp->previous->previous;
                     }
                 }
                 else
                 {
-                    temp = temp->next;
+                    temp = temp->previous;
                 }
             }
             return;
-        case Empty: // SUSPECT N1
-            while (temp->next != nullptr)
+        case Empty:
+
+            while (temp2->next != nullptr)
             {
-                temp->pos = temp->next->pos;
-                temp = temp->next;
+                temp2->pos = temp2->next->pos;
+                temp2 = temp2->next;
             }
-            temp->pos = game->snake.head;
+            temp2->pos = game->snake.head;
             game->snake.head = pos;
+            
             return;
         default:
             cout << "defaut" << endl;
@@ -336,9 +363,7 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     {
         while (temp != nullptr && temp->type != NBODY)
         {
-            cout << "temp" << temp->type << endl;
             draw_texture(window, BodyTexture[temp->type], (temp->pos % game->world->width * case_sizeX), (temp->pos / game->world->width * case_sizeY), case_sizeX, case_sizeY);
-
             temp = temp->previous;
         }
     }
