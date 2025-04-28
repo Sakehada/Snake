@@ -214,8 +214,7 @@ void move_snake(Window *window, Game *game, int *delay)
 {
     cout << "Debut move" << endl;
     int pos = game->snake.head + game->directions[game->snake.d];
-    if (pos <= 0 && pos < game->world->width * game->world->height)
-    {
+    if (pos >= 0 && pos < game->world->width * game->world->height){
         Body *temp = game->snake.queue;
         switch (game->world->grid[pos])
         {
