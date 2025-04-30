@@ -230,7 +230,7 @@ void move_snake(Window *window, Game *game, int *delay)
 {
     cout << "Debut move" << endl;
     int pos = game->snake.head + game->directions[game->snake.d];
-    if ((pos % game->world->width == 0 && game->snake.d == DROITE) || (pos % game->world->width == game->world->width - 1 && game->snake.d == GAUCHE)  || pos > game->world->width * game->world->height){
+    if ((pos % game->world->width == 0 && game->snake.d == DROITE) || (pos % game->world->width == game->world->width - 1 && game->snake.d == GAUCHE)  || pos > game->world->width * game->world->height || pos < 0){
         game->statut = GameOver;
         play(game->mixer, Death, 800);
         // GAME OVER
