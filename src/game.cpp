@@ -223,7 +223,12 @@ void move_snake(Window *window, Game *game, int *delay)
 {
     cout << "Debut move" << endl;
     int pos = game->snake.head + game->directions[game->snake.d];
-    if (pos >= 0 && pos < game->world->width * game->world->height){
+    if ((pos % game->world->width == 0 && game->snake.d == DROITE) || (pos % game->world->width == game->world->width - 1 && game->snake.d == GAUCHE)  || pos > game->world->width * game->world->height){
+        game->statut = GameOver;
+        // GAME OVER
+    }
+    else
+    {
         Body *temp = game->snake.neck;
         Body *temp2 = game->snake.queue;
         switch (game->world->grid[pos])
@@ -296,11 +301,6 @@ void move_snake(Window *window, Game *game, int *delay)
             cout << "passer" << endl;
             break;
         }
-    }
-    else
-    {
-        game->statut = GameOver;
-        // GAME OVER
     }
     cout << "fin move" << endl;
 }
