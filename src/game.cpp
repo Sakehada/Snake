@@ -215,6 +215,7 @@ void feed(Game *game, BodyType type, int pos)
     }    
     game->snake.head = pos;
     game->world->grid[pos] = Empty;
+    game->score += 1;
 }
 
 void move_snake(Window *window, Game *game, int *delay)
@@ -234,7 +235,9 @@ void move_snake(Window *window, Game *game, int *delay)
                 if (temp->type == temp->previous->type)
                 {
                     if (temp->type == temp->previous->previous->type)
-                    {      
+                    {   
+                        game->score += 3;
+                        
                         if(temp->previous->previous->previous == nullptr){
                             if(temp->next == nullptr){    
                                 Body* vide = new Body;
