@@ -6,11 +6,11 @@ using namespace std;
 
 struct Mixer
 {
-    const string pathes[4]{"break.wav", "ball.wav", "music1.wav", "music2.wav"};
-    const int volumes[4]{90, 120, 30, 50};
-    const ESample Effects[2]{Break, Bong};
+    const string pathes[4]{"eat.wav", "star.wav", "death.wav", "music.wav"};
+    const int volumes[4]{100, 100, 100, 50};
+    const ESample Effects[3]{Eat, StarS, Death};
     bool effects{true};
-    const ESample Songs[2]{Music1, Music2};
+    const ESample Songs[1]{Music1};
     bool songs{true};
     Mix_Chunk **samples;
 };

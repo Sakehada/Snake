@@ -32,6 +32,7 @@ struct Snake
 
 struct Game
 {
+    Mixer *mixer;
     World *world;
     Snake snake;
     int score;

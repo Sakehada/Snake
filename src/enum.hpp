@@ -1,10 +1,10 @@
 
 enum ESample
 {
-    Break,
-    Bong,
-    Music1,
-    Music2
+    Eat,
+    StarS,
+    Death,
+    Music1
 };
 
 enum SoundType

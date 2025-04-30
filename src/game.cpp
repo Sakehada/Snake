@@ -1,7 +1,10 @@
 #include "game.hpp"
 
-void init_game(Game *game, string filename) // New game
-{                                           // Initie la partie, y compris le monde
+void init_game(Game *game, string filename) // New game // Initie la partie, y compris le monde
+{             
+    game->mixer = new Mixer;
+    init_audio(game->mixer);
+    play(game->mixer, Music1);                              
     game->world = new World;
     init_world_from_file(game->world, filename);
     game->score = 0;
@@ -20,6 +23,9 @@ void init_game(Game *game, string filename) // New game
 
 void load_game(Game *game, string filename)
 {
+    game->mixer = new Mixer;
+    init_audio(game->mixer);   
+    play(game->mixer, Music1);
     game->world = new World;
 
     cout << "etape 1" << endl;
@@ -201,6 +207,7 @@ void save_game(Game *game, string pathSave)
 
 void feed(Game *game, Block type, int pos)
 {
+    play(game->mixer, Eat, 500);
     Body *a = new Body;
     cout << "A " << a << endl;
     a->type = (BodyType)type;
@@ -225,6 +232,7 @@ void move_snake(Window *window, Game *game, int *delay)
     int pos = game->snake.head + game->directions[game->snake.d];
     if ((pos % game->world->width == 0 && game->snake.d == DROITE) || (pos % game->world->width == game->world->width - 1 && game->snake.d == GAUCHE)  || pos > game->world->width * game->world->height){
         game->statut = GameOver;
+        play(game->mixer, Death, 800);
         // GAME OVER
     }
     else
@@ -234,6 +242,7 @@ void move_snake(Window *window, Game *game, int *delay)
         switch (game->world->grid[pos])
         {
         case Star:
+            play(game->mixer, StarS, 700);
             *delay = 100;
             spawn(game, game->world->grid[pos]);
             game->world->grid[pos] = Empty;
