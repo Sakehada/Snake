@@ -199,11 +199,11 @@ void save_game(Game *game, string pathSave)
     }
 }
 
-void feed(Game *game, BodyType type, int pos)
+void feed(Game *game, Block type, int pos)
 {
     Body *a = new Body;
     cout << "A " << a << endl;
-    a->type = type;
+    a->type = (BodyType)type;
     a->pos = game->snake.head;  
     if(game->snake.queue->type == NBODY){
         game->snake.queue = a;
@@ -216,6 +216,7 @@ void feed(Game *game, BodyType type, int pos)
     game->snake.head = pos;
     game->world->grid[pos] = Empty;
     game->score += 1;
+    spawn(game, type);
 }
 
 void move_snake(Window *window, Game *game, int *delay)
@@ -229,6 +230,7 @@ void move_snake(Window *window, Game *game, int *delay)
         {
         case Star:
             *delay = 100;
+            spawn(game, game->world->grid[pos]);
             game->world->grid[pos] = Empty;
             while (temp->previous != nullptr && temp->previous->previous != nullptr)
             {
@@ -290,7 +292,7 @@ void move_snake(Window *window, Game *game, int *delay)
             return;
         default:
             cout << "defaut" << endl;
-            feed(game, (BodyType)game->world->grid[pos], pos);
+            feed(game, game->world->grid[pos], pos);
             cout << "passer" << endl;
             break;
         }
@@ -528,4 +530,23 @@ bool keyboard_eventGameOver(Game *game, Window *window) // regarde les actions d
         }
     }
     return false;
+}
+
+bool checkBody(Game *game, int pos){
+    Body* temp = game->snake.neck;
+    while(temp != nullptr){
+        if(temp->pos == pos){
+            return true;
+        }
+        temp = temp->previous;
+    }
+    return false;
+}
+
+void spawn(Game *game, Block type){
+    int rngpos;
+    do{
+        rngpos = rand() % (game->world->height * game->world->width);
+    }while(game->world->grid[rngpos] != Empty || checkBody(game, rngpos));
+    game->world->grid[rngpos] = type;
 }

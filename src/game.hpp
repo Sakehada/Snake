@@ -40,7 +40,7 @@ struct Game
 };
 
 void init_game(Game *game, string filename);
-void feed(Game *game, BodyType type, int pos);
+void feed(Game *game, Block type, int pos);
 void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *BodyTexture[3], int delay);
 void move_snake(Window *window, Game *game, int *delay);
 void change_statut(Statut *statut);
@@ -49,4 +49,6 @@ bool keyboard_event(Game *game, Window *window, string pathMap);
 bool keyboard_eventLoad(Game *game, Window *window, int *counter, bool *select);
 bool keyboard_eventGameOver(Game *game, Window *window);
 void load_game(Game *game, string filename);
+void spawn(Game *game, Block type);
+bool checkBody(Game *game, int pos);
 #endif
