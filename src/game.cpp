@@ -1,10 +1,10 @@
 #include "game.hpp"
 
 void init_game(Game *game, string filename) // New game // Initie la partie, y compris le monde
-{             
+{
     game->mixer = new Mixer;
     init_audio(game->mixer);
-    play(game->mixer, Music1);                              
+    play(game->mixer, Music1);
     game->world = new World;
     init_world_from_file(game->world, filename);
     game->score = 0;
@@ -24,7 +24,7 @@ void init_game(Game *game, string filename) // New game // Initie la partie, y c
 void load_game(Game *game, string filename)
 {
     game->mixer = new Mixer;
-    init_audio(game->mixer);   
+    init_audio(game->mixer);
     play(game->mixer, Music1);
     game->world = new World;
 
@@ -65,6 +65,7 @@ void load_game(Game *game, string filename)
                 default:
                     cout << "Erreur de lecture de la map: " << line[k] << endl;
                     return;
+                    break;
                 }
                 write(game->world, k, i, b);
             }
@@ -123,9 +124,9 @@ void load_game(Game *game, string filename)
             cout << i + "etape 4" << endl;
 
             Body *ptrPrevious = ptrcurrent;
-            ptrcurrent->next = new Body;
-            ptrcurrent = ptrcurrent->next;
-            ptrcurrent->previous = ptrPrevious;
+            ptrcurrent->previous = new Body;
+            ptrcurrent = ptrcurrent->previous;
+            ptrcurrent->next = ptrPrevious;
             cout << i + "etape 5" << endl;
         }
         game->snake.queue = ptrcurrent;
@@ -140,69 +141,106 @@ void load_game(Game *game, string filename)
 void save_game(Game *game, string pathSave)
 {
     // sauvegarde du monde
-    cout << game->world->width << endl;
-    cout << game->world->height << endl;
+
+    FILE *fp = fopen(pathSave.c_str(), "w");
+    stringstream ss;
+    ss << game->world->width;
+    string line;
+    ss >> line;
+    fputs(line.c_str(), fp);
+    fputs("\n", fp);
+    ss.clear();
+    ss << game->world->height;
+    ss >> line;
+    fputs(line.c_str(), fp);
+    fputs("\n", fp);
+    ss.clear();
+
     for (int i = 0; i < game->world->height * game->world->width; i++)
     {
         if (i != 0 && i % (game->world->width) == 0)
         {
-            cout << endl;
+            fputs("\n", fp);
         }
         switch (game->world->grid[i])
         {
         case Empty:
-            cout << '.';
+            fputs(".", fp);
             break;
         case R:
-            cout << 'R';
+            fputs("R", fp);
             break;
         case G:
-            cout << 'G';
+            fputs("G", fp);
             break;
         case B:
-            cout << 'B';
+            fputs("B", fp);
             break;
         case Star:
-            cout << 'S';
+            fputs("S", fp);
             break;
 
         default:
             break;
         }
     }
-    cout << endl;
-    cout << game->score << endl;      // sauvegarde le score
-    cout << game->snake.head << endl; // l'emplacement de tete
+
+    fputs("\n", fp);
+    ss << game->score; // sauvegarde le score
+    ss >> line;
+    fputs(line.c_str(), fp);
+    fputs("\n", fp);
+    ss.clear();
+    ss << game->snake.head; // l'emplacement de tete
+    ss >> line;
+    fputs(line.c_str(), fp);
+    fputs("\n", fp);
+    ss.clear();
+
     int count = 0;
     Body *ptr = game->snake.neck;
     while (ptr != NULL) // Compte il y a de body
     {
         count++;
-        ptr = ptr->next;
+        ptr = ptr->previous;
     }
-    cout << count << endl;
+    ss << count;
+    ss >> line;
+    fputs(line.c_str(), fp);
+    fputs("\n", fp);
+    ss.clear();
     ptr = game->snake.neck;
     for (int i = 0; i < count; i++) // Pour chaque body
     {
-        cout << ptr->pos << endl;
+        ss << ptr->pos;
+        ss >> line;
+        fputs(line.c_str(), fp);
+        fputs("\n", fp);
+        ss.clear();
         switch (ptr->type)
         {
         case NBODY:
-            cout << 'N' << endl;
+            fputs("N", fp);
+            fputs("\n", fp);
             break;
         case RBODY:
-            cout << 'R' << endl;
+            fputs("R", fp);
+            fputs("\n", fp);
             break;
         case GBODY:
-            cout << 'G' << endl;
+            fputs("G", fp);
+            fputs("\n", fp);
             break;
         case BBODY:
-            cout << 'B' << endl;
+            fputs("B", fp);
+            fputs("\n", fp);
             break;
         default:
             break;
         }
+        ptr = ptr->previous;
     }
+    fclose(fp);
 }
 
 void feed(Game *game, Block type, int pos)
@@ -211,15 +249,18 @@ void feed(Game *game, Block type, int pos)
     Body *a = new Body;
     cout << "A " << a << endl;
     a->type = (BodyType)type;
-    a->pos = game->snake.head;  
-    if(game->snake.queue->type == NBODY){
+    a->pos = game->snake.head;
+    if (game->snake.queue->type == NBODY)
+    {
         game->snake.queue = a;
         game->snake.neck = a;
-    }else{
+    }
+    else
+    {
         a->previous = game->snake.neck;
         game->snake.neck->next = a;
         game->snake.neck = a;
-    }    
+    }
     game->snake.head = pos;
     game->world->grid[pos] = Empty;
     game->score += 1;
@@ -230,7 +271,8 @@ void move_snake(Window *window, Game *game, int *delay)
 {
     cout << "Debut move" << endl;
     int pos = game->snake.head + game->directions[game->snake.d];
-    if ((pos % game->world->width == 0 && game->snake.d == DROITE) || (pos % game->world->width == game->world->width - 1 && game->snake.d == GAUCHE)  || pos > game->world->width * game->world->height || pos < 0){
+    if ((pos % game->world->width == 0 && game->snake.d == DROITE) || (pos % game->world->width == game->world->width - 1 && game->snake.d == GAUCHE) || pos > game->world->width * game->world->height || pos < 0)
+    {
         game->statut = GameOver;
         play(game->mixer, Death, 800);
         // GAME OVER
@@ -251,25 +293,33 @@ void move_snake(Window *window, Game *game, int *delay)
                 if (temp->type == temp->previous->type)
                 {
                     if (temp->type == temp->previous->previous->type)
-                    {   
+                    {
                         game->score += 3;
-                        
-                        if(temp->previous->previous->previous == nullptr){
-                            if(temp->next == nullptr){    
-                                Body* vide = new Body;
-                                vide->type = NBODY;                      
+
+                        if (temp->previous->previous->previous == nullptr)
+                        {
+                            if (temp->next == nullptr)
+                            {
+                                Body *vide = new Body;
+                                vide->type = NBODY;
                                 game->snake.queue = vide;
                                 game->snake.neck = vide;
-                            }else{
+                            }
+                            else
+                            {
                                 game->snake.queue = temp->next;
                                 game->snake.queue->previous = nullptr;
                             }
-                            
-                        }else{
-                            if(temp->next == nullptr){
+                        }
+                        else
+                        {
+                            if (temp->next == nullptr)
+                            {
                                 game->snake.neck = temp->previous->previous->previous;
                                 game->snake.neck->next = nullptr;
-                            }else{
+                            }
+                            else
+                            {
                                 temp->next->previous = temp->previous->previous->previous;
                                 temp->previous->previous->previous->next = temp->next;
                             }
@@ -278,7 +328,7 @@ void move_snake(Window *window, Game *game, int *delay)
                         delete temp->previous->previous;
                         delete temp->previous;
                         delete temp;
-                        
+
                         cout << "NECK " << game->snake.neck << " QUEUE " << game->snake.queue << endl;
                         return;
                     }
@@ -302,7 +352,7 @@ void move_snake(Window *window, Game *game, int *delay)
             }
             temp2->pos = game->snake.head;
             game->snake.head = pos;
-            
+
             return;
         default:
             cout << "defaut" << endl;
@@ -406,13 +456,7 @@ bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les a
                 mute_audio_type(window->mixer, 1);
                 return false;
             case SDLK_s: // sauvegarde
-                save_game(game, "ol");
-                return false;
-            case SDLK_r: // reset
-                game->statut = Begin;
-                return false;
-            case SDLK_l: // oad menu
-                game->statut = Load;
+                game->statut = Save;
                 return false;
             case SDLK_SPACE: // Pause
                 change_statut(&(game->statut));
@@ -430,6 +474,41 @@ bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les a
                 game->snake.d = BAS;
                 return false;
 
+            default:
+                return false;
+                break;
+            }
+        }
+    }
+    return false;
+}
+bool keyboard_eventBreak(Game *game, Window *window, string pathMap)
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event) != 0)
+    {
+        if (event.type == SDL_KEYDOWN)
+        {
+            SDL_KeyboardEvent key_event = event.key;
+            switch (key_event.keysym.sym)
+            {
+            case SDLK_q: // pour quitter
+                return true;
+            case SDLK_m: // mute la musique
+                mute_audio_type(window->mixer, 1);
+                return false;
+            case SDLK_s: // sauvegarde
+                game->statut = Save;
+                return false;
+            case SDLK_r: // reset
+                game->statut = Begin;
+                return false;
+            case SDLK_l: // oad menu
+                game->statut = Load;
+                return false;
+            case SDLK_SPACE: // Pause
+                change_statut(&(game->statut));
+                return false;
             default:
                 return false;
                 break;
@@ -530,7 +609,7 @@ bool keyboard_eventGameOver(Game *game, Window *window) // regarde les actions d
                 return true;
 
             case SDLK_r:
-                game->statut = Begin;
+                change_statut(&(game->statut));
                 return false;
             default:
                 return false;
@@ -541,10 +620,13 @@ bool keyboard_eventGameOver(Game *game, Window *window) // regarde les actions d
     return false;
 }
 
-bool checkBody(Game *game, int pos){
-    Body* temp = game->snake.neck;
-    while(temp != nullptr){
-        if(temp->pos == pos){
+bool checkBody(Game *game, int pos)
+{
+    Body *temp = game->snake.neck;
+    while (temp != nullptr)
+    {
+        if (temp->pos == pos)
+        {
             return true;
         }
         temp = temp->previous;
@@ -552,10 +634,12 @@ bool checkBody(Game *game, int pos){
     return false;
 }
 
-void spawn(Game *game, Block type){
+void spawn(Game *game, Block type)
+{
     int rngpos;
-    do{
+    do
+    {
         rngpos = rand() % (game->world->height * game->world->width);
-    }while(game->world->grid[rngpos] != Empty || checkBody(game, rngpos));
+    } while (game->world->grid[rngpos] != Empty || checkBody(game, rngpos));
     game->world->grid[rngpos] = type;
 }

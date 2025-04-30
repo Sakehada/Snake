@@ -44,5 +44,6 @@ enum Statut
     Pause,
     Begin,
     GameOver,
-    Load
+    Load,
+    Save
 };

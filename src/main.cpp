@@ -39,6 +39,8 @@ int main(int argc, char **argv)
     bool select;
     counter = 1;
     select = false;
+    stringstream str;
+    string score;
     // game.statut = GameOver;
     while (!quit)
     {
@@ -109,34 +111,80 @@ int main(int argc, char **argv)
                 }
             }
             break;
-
+        case Save:
+            // save_game(game, "./assets/map/Save2.txt");
+            clear_window(&window);
+            set_color(&window.foreground, 250, 250, 250, 250);
+            set_color(&window.background, 0, 0, 0, 250);
+            draw_text(&window, "Save :", window.width / 3, 0);
+            draw_text(&window, "-->", (window.width / 3) - 40, counter * window.height / 5);
+            draw_text(&window, "Game 1", window.width / 3, window.height / 5);
+            draw_text(&window, "Game 2", window.width / 3, 2 * window.height / 5);
+            draw_text(&window, "Game 3", window.width / 3, 3 * window.height / 5);
+            draw_text(&window, "Game 4", window.width / 3, 4 * window.height / 5);
+            refresh_window(&window);
+            quit = keyboard_eventLoad(&game, &window, &counter, &select);
+            if (select == 1)
+            {
+                switch (counter)
+                {
+                case 1:
+                    save_game(&game, "./assets/map/Save1.txt");
+                    game.statut = Play;
+                    break;
+                case 2:
+                    save_game(&game, "./assets/map/Save2.txt");
+                    game.statut = Play;
+                    break;
+                case 3:
+                    save_game(&game, "./assets/map/Save3.txt");
+                    game.statut = Play;
+                    break;
+                case 4:
+                    save_game(&game, "./assets/map/Save4.txt");
+                    game.statut = Play;
+                    break;
+                }
+            }
+            break;
         case Play:
             clear_window(&window);
             move_snake(&window, &game, &delay);
             display_game(&window, &game, TextureBackground, TextureHead, TextureBody, delay);
             quit = keyboard_event(&game, &window, pathMapNewGame);
-            if(delay < 200){
+            if (delay < 200)
+            {
                 delay += 10;
-            }        
+            }
             cout << game.snake.head << endl;
             break;
 
         case GameOver:
+
+            str << game.score;
+            str >> score;
             clear_window(&window);
             draw_text(&window, "Game Over", (window.width / 3) - 40, window.height / 5);
-            draw_text(&window, "Votre score: " + game.score, (window.width / 3) - 40, window.height / 5);
+            draw_text(&window, "Votre score: " + score, (window.width / 3) - 40, 2 * window.height / 5);
             draw_text(&window, "R pour recommencer", (window.width / 3) - 40, 3 * window.height / 5);
             draw_text(&window, "Q pour quitter", (window.width / 3) - 40, 4 * window.height / 5);
             refresh_window(&window);
             quit = keyboard_eventGameOver(&game, &window);
+            str.clear();
+            counter = 1;
+            select = false;
+            SDL_Delay(10);
+
             break;
 
         case Pause:
-            draw_text(&window, "Load menu = l", (window.width / 3) - 40, window.height / 5);
-            draw_text(&window, "R pour recommencer", (window.width / 3) - 40, 2 * window.height / 5);
+            draw_text(&window, "Load menu = l", (window.width / 3) - 40, window.height / 10);
+            draw_text(&window, "R = Reset", (window.width / 3) - 40, 2 * window.height / 10);
+            draw_text(&window, "Save menu = S", (window.width / 3) - 40, 3 * window.height / 10);
+            draw_text(&window, "Pause", (window.width / 3) - 40, 2 * 4 * window.height / 10);
             refresh_window(&window);
             SDL_Delay(10);
-            quit = keyboard_event(&game, &window, pathMapNewGame);
+            quit = keyboard_eventBreak(&game, &window, pathMapNewGame);
             counter = 1;
             select = false;
             break;
