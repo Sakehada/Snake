@@ -167,6 +167,7 @@ int main(int argc, char **argv)
             str.clear();
             counter = 1;
             select = false;
+            SDL_Delay(10);
 
             break;
 
@@ -176,6 +177,7 @@ int main(int argc, char **argv)
             draw_text(&window, "Save menu = S", (window.width / 3) - 40, 3 * window.height / 10);
             draw_text(&window, "Pause", (window.width / 3) - 40, 2 * 4 * window.height / 10);
             refresh_window(&window);
+            SDL_Delay(10);
             quit = keyboard_eventBreak(&game, &window, pathMapNewGame);
             counter = 1;
             select = false;
