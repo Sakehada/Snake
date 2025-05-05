@@ -328,6 +328,7 @@ void move_snake(Window *window, Game *game, int *delay) // Fait avancer le serpe
             {
                 if(temp2->pos == pos){
                     game->statut = GameOver;
+                    play(game->mixer, Death, 800);
                     return;
                 }
                 temp2->pos = temp2->next->pos;
@@ -432,9 +433,6 @@ bool keyboard_event(Game *game, Window *window, string pathMap) // regarde les a
             {
             case SDLK_q: // pour quitter
                 return true;
-            case SDLK_m: // mute la musique
-                mute_audio_type(window->mixer, 1);
-                return false;
             case SDLK_s: // sauvegarde
                 game->statut = Save;
                 return false;
@@ -474,9 +472,6 @@ bool keyboard_eventBreak(Game *game, Window *window, string pathMap)
             {
             case SDLK_q: // pour quitter
                 return true;
-            case SDLK_m: // mute la musique
-                mute_audio_type(window->mixer, 1);
-                return false;
             case SDLK_s: // sauvegarde
                 game->statut = Save;
                 return false;
