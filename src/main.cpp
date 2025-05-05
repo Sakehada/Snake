@@ -41,12 +41,11 @@ int main(int argc, char **argv)
     select = false;
     stringstream str;
     string score;
-    // game.statut = GameOver;
     while (!quit)
     {
-        switch (game.statut)
+        switch (game.statut)    // Vérifie le statut du jeu
         {
-        case Begin:
+        case Begin: // affiche le menu de démarrage
             clear_window(&window);
             set_color(&window.foreground, 250, 250, 250, 250);
             set_color(&window.background, 0, 0, 0, 250);
@@ -73,7 +72,7 @@ int main(int argc, char **argv)
             }
             break;
 
-        case Load:
+        case Load:  // Affiche le menu de chargement
 
             clear_window(&window);
             set_color(&window.foreground, 250, 250, 250, 250);
@@ -111,8 +110,7 @@ int main(int argc, char **argv)
                 }
             }
             break;
-        case Save:
-            // save_game(game, "./assets/map/Save2.txt");
+        case Save:  // affiche le menu de sauvegarde
             clear_window(&window);
             set_color(&window.foreground, 250, 250, 250, 250);
             set_color(&window.background, 0, 0, 0, 250);
@@ -147,7 +145,7 @@ int main(int argc, char **argv)
                 }
             }
             break;
-        case Play:
+        case Play:  // affiche le jeu en cours
             clear_window(&window);
             move_snake(&window, &game, &delay);
             display_game(&window, &game, TextureBackground, TextureHead, TextureBody, delay);
@@ -159,7 +157,7 @@ int main(int argc, char **argv)
             cout << game.snake.head << endl;
             break;
 
-        case GameOver:
+        case GameOver:   // affiche le menu de défaite
 
             str << game.score;
             str >> score;
@@ -177,7 +175,7 @@ int main(int argc, char **argv)
 
             break;
 
-        case Pause:
+        case Pause: // Affiche le menu de pause
             draw_text(&window, "Load menu = l", (window.width / 3) - 40, window.height / 10);
             draw_text(&window, "R = Reset", (window.width / 3) - 40, 2 * window.height / 10);
             draw_text(&window, "Save menu = S", (window.width / 3) - 40, 3 * window.height / 10);

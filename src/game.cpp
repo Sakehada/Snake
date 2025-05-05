@@ -1,6 +1,6 @@
 #include "game.hpp"
 
-void init_game(Game *game, string filename) // New game // Initie la partie, y compris le monde
+void init_game(Game *game, string filename) // Initialise un nouveau monde
 {
     game->mixer = new Mixer;
     init_audio(game->mixer);
@@ -11,22 +11,22 @@ void init_game(Game *game, string filename) // New game // Initie la partie, y c
     game->statut = Begin;
     game->snake.head = (game->world->height / 2) * game->world->width + game->world->width / 2; // On place le Snake au milieu de la grille
     game->snake.d = HAUT;                                                                       // Par defaut il va vers le haut
-    game->snake.neck = new Body;
+    game->snake.neck = new Body;                                                                // On initie le cou et la queue à un body de type Empty
     game->snake.neck->type = NBODY;
     game->snake.queue = new Body;
     game->snake.queue->type = NBODY;
-    game->directions[0] = -game->world->width;
+    game->directions[0] = -game->world->width;                                                  // On initie le tableau de directions en fonction de la taille du tableau
     game->directions[1] = game->world->width;
     game->directions[2] = -1;
     game->directions[3] = 1;
 }
 
-void load_game(Game *game, string filename)
+void load_game(Game *game, string filename) // Charge une sauvegarde
 {
-    game->mixer = new Mixer;
+    game->mixer = new Mixer;                                                                   // On initie l'audio du jeu                            
     init_audio(game->mixer);
-    play(game->mixer, Music1);
-    game->world = new World;
+    play(game->mixer, Music1);                                                                 // On lance la musique
+    game->world = new World;                                    
 
     cout << "etape 1" << endl;
     ifstream fic(filename.c_str());
@@ -70,41 +70,30 @@ void load_game(Game *game, string filename)
                 write(game->world, k, i, b);
             }
         }
-        game->directions[0] = -game->world->width;
+        game->directions[0] = -game->world->width;                      // On initie le tableau de directions en fonction de la taille du tableau
         game->directions[1] = game->world->width;
         game->directions[2] = -1;
         game->directions[3] = 1;
         game->statut = Play;
-        cout << "etape 3" << endl;
         fic >> game->score; // on prend le score
-        cout << "etape 4" << endl;
         fic >> game->snake.head; // On prend la position de la tete
-        cout << "etape 5" << endl;
         game->snake.d = HAUT; // On met par defaut la position haut
-        cout << "etape 6" << endl;
         game->statut = Play;
-        cout << "etape 7" << endl;
         int taille;
         char Type;
         fic >> taille; // On prend la taille du snake
         cout << taille;
         Body *ptrcurrent = game->snake.neck;
-        cout << "etape 8" << endl;
         ptrcurrent = new Body;
-        cout << "etape 9" << endl;
         for (int i = 0; i < taille; i++) // Pour le nombre de Body du snake
         {
-            cout << i + "etape" << endl;
             // On alloue de la memoire
-            cout << i + "etape 1" << endl;
             if (i == 0) // Si c est le 1er element il devient le neck
             {
                 game->snake.neck = ptrcurrent;
-                cout << i + "etape 2" << endl;
                 ptrcurrent->previous = NULL;
             }
             fic >> ptrcurrent->pos; // On prend la position du body
-            cout << i + "etape 3" << endl;
             fic >> Type; // On prend le type du body
             switch (Type)
             {
@@ -121,16 +110,13 @@ void load_game(Game *game, string filename)
                 ptrcurrent->type = NBODY;
                 break;
             }
-            cout << i + "etape 4" << endl;
 
             Body *ptrPrevious = ptrcurrent;
             ptrcurrent->previous = new Body;
             ptrcurrent = ptrcurrent->previous;
             ptrcurrent->next = ptrPrevious;
-            cout << i + "etape 5" << endl;
         }
         game->snake.queue = ptrcurrent;
-        cout << "etape 6" << endl;
     }
     else
     {
@@ -243,36 +229,35 @@ void save_game(Game *game, string pathSave)
     fclose(fp);
 }
 
-void feed(Game *game, Block type, int pos)
+void feed(Game *game, Block type, int pos)  // Fait grandir le snake, vide la case et fait apparaitre une nourriture du meme type
 {
-    play(game->mixer, Eat, 500);
-    Body *a = new Body;
-    cout << "A " << a << endl;
+    play(game->mixer, Eat, 500);    // Joue le son de manger pendant 500ms
+    Body *a = new Body;             // Initie le body du type de la nourriture
+    cout << "A " << a << endl; 
     a->type = (BodyType)type;
-    a->pos = game->snake.head;
-    if (game->snake.queue->type == NBODY)
+    a->pos = game->snake.head;      // Definis la position du body au niveau de la tete.
+    if (game->snake.queue->type == NBODY)   // Si le corps est vide, on définis la tete et le cou comme étant le nouveau body
     {
-        game->snake.queue = a;
+        game->snake.queue = a;  
         game->snake.neck = a;
     }
-    else
+    else    // Sinon, on définit le cou comme étant le body précédent du nouveau body 
     {
-        a->previous = game->snake.neck;
+        a->previous = game->snake.neck; 
         game->snake.neck->next = a;
         game->snake.neck = a;
     }
-    game->snake.head = pos;
+    game->snake.head = pos; // On avance la tete à la position de la nourriture
     game->world->grid[pos] = Empty;
-    game->score += 1;
-    spawn(game, type);
+    game->score++;
+    spawn(game, type);                                      // fait apparaitre une nourriture du meme type
 }
 
-void move_snake(Window *window, Game *game, int *delay)
+void move_snake(Window *window, Game *game, int *delay) // Fait avancer le serpent en fonction de sa direction 
 {
-    cout << "Debut move" << endl;
     int pos = game->snake.head + game->directions[game->snake.d];
     if ((pos % game->world->width == 0 && game->snake.d == DROITE) || (pos % game->world->width == game->world->width - 1 && game->snake.d == GAUCHE) || pos > game->world->width * game->world->height || pos < 0)
-    {
+    { // Si la position est en dehors de la map, la partie est perdue.
         game->statut = GameOver;
         play(game->mixer, Death, 800);
         // GAME OVER
@@ -281,31 +266,31 @@ void move_snake(Window *window, Game *game, int *delay)
     {
         Body *temp = game->snake.neck;
         Body *temp2 = game->snake.queue;
-        switch (game->world->grid[pos])
+        switch (game->world->grid[pos]) // regarde le type de la case sur laquelle va le snake
         {
         case Star:
             play(game->mixer, StarS, 700);
             *delay = 100;
-            spawn(game, game->world->grid[pos]);
+            spawn(game, game->world->grid[pos]); // Fait spawn une nouvelle étoile
             game->world->grid[pos] = Empty;
-            while (temp->previous != nullptr && temp->previous->previous != nullptr)
+            while (temp->previous != nullptr && temp->previous->previous != nullptr)    // Si le body actuel a encore 2 body précedents 
             {
-                if (temp->type == temp->previous->type)
+                if (temp->type == temp->previous->type) 
                 {
                     if (temp->type == temp->previous->previous->type)
                     {
-                        game->score += 3;
+                        game->score += 3;   // Ajoute 3 points de score lorsque l'étoile détruit 1 trio de body
 
                         if (temp->previous->previous->previous == nullptr)
                         {
-                            if (temp->next == nullptr)
+                            if (temp->next == nullptr)   // Si le trio n'a pas d'element precedent et suivant, on définis le corps comme étant vide
                             {
                                 Body *vide = new Body;
                                 vide->type = NBODY;
                                 game->snake.queue = vide;
                                 game->snake.neck = vide;
                             }
-                            else
+                            else   // Si le trio n'a pas d'élement précédent et a un élement suivant, on définis la queue comme étant l'élément suivant
                             {
                                 game->snake.queue = temp->next;
                                 game->snake.queue->previous = nullptr;
@@ -313,37 +298,35 @@ void move_snake(Window *window, Game *game, int *delay)
                         }
                         else
                         {
-                            if (temp->next == nullptr)
+                            if (temp->next == nullptr)  // Si le trio a un element précédent et n'a pas d'element suivant, on définis l'élement précédent comme étant le cou.
                             {
                                 game->snake.neck = temp->previous->previous->previous;
                                 game->snake.neck->next = nullptr;
                             }
-                            else
+                            else    // Si le trio a un element précedent et suivant, on raccorde les deux elements
                             {
                                 temp->next->previous = temp->previous->previous->previous;
                                 temp->previous->previous->previous->next = temp->next;
                             }
                         }
 
-                        delete temp->previous->previous;
+                        delete temp->previous->previous;     // Supprime le trio
                         delete temp->previous;
                         delete temp;
-
-                        cout << "NECK " << game->snake.neck << " QUEUE " << game->snake.queue << endl;
                         return;
                     }
                     else
                     {
-                        temp = temp->previous->previous;
+                        temp = temp->previous->previous; // recule de 2 body
                     }
                 }
                 else
-                {
-                    temp = temp->previous;
+                {  
+                    temp = temp->previous; // recule de 1 body
                 }
             }
             return;
-        case Empty:
+        case Empty: // Si la case est vide, on avance le snake et, si la tete heurte un élement du corps, on perds la partie.
 
             while (temp2->next != nullptr)
             {
@@ -359,7 +342,7 @@ void move_snake(Window *window, Game *game, int *delay)
             return;
         default:
             cout << "defaut" << endl;
-            feed(game, game->world->grid[pos], pos);
+            feed(game, game->world->grid[pos], pos);    // si le block n'est pas empty ou star, fait grandir le snake et y ajoutant un body du type du block
             cout << "passer" << endl;
             break;
         }
@@ -367,7 +350,7 @@ void move_snake(Window *window, Game *game, int *delay)
     cout << "fin move" << endl;
 }
 
-void change_statut(Statut *statut)
+void change_statut(Statut *statut) 
 { // change le statut du jeu en fonction du statut actuel
     switch (*statut)
     {
@@ -389,14 +372,15 @@ void change_statut(Statut *statut)
 void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Texture *HeadTexture[8], SDL_Texture *BodyTexture[3], int delay)
 { // réinitialise le contenu de la fenetre, dessine la map, le snake puis rafraichit la fenetre
     clear_window(window);
-    int case_sizeX = window->width / game->world->width;
+    int case_sizeX = window->width / game->world->width; // Définis la taille des cases en fonction du nombre de cases
     int case_sizeY = window->height / game->world->height;
     set_color(&window->background, 255, 255, 255, 255);
 
     for (int i = 0; i < game->world->width * game->world->height; i++)
     {
+        // rend le fond d'écran
         draw_texture(window, BackGround[0], (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY); // On dessine le background
-        switch (game->world->grid[i])                                                                                                              // On dessine les pastilles
+        switch (game->world->grid[i]) // rend chaque case en fonction du type de block                                                                                                     // On dessine les pastilles
         {
         case Statut(R):
             draw_texture(window, BackGround[1], (i % game->world->width * case_sizeX), (i / game->world->width * case_sizeY), case_sizeX, case_sizeY);
@@ -415,7 +399,7 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
         }
     }
 
-    switch (game->snake.manger)
+    switch (game->snake.manger) // dessine la tete en fonction du statut du snake (mange ou non) et de sa direction
     {
     case true:
         draw_texture(window, HeadTexture[game->snake.d + 4], (game->snake.head % game->world->width * case_sizeX), (game->snake.head / game->world->width * case_sizeY), case_sizeX, case_sizeY);
@@ -428,14 +412,14 @@ void display_game(Window *window, Game *game, SDL_Texture *BackGround[5], SDL_Te
     Body *temp = game->snake.neck;
     if (temp->type != NBODY)
     {
-        while (temp != nullptr && temp->type != NBODY)
+        while (temp != nullptr && temp->type != NBODY)  // Dessine le corps du snake
         {
             draw_texture(window, BodyTexture[temp->type], (temp->pos % game->world->width * case_sizeX), (temp->pos / game->world->width * case_sizeY), case_sizeX, case_sizeY);
             temp = temp->previous;
         }
     }
 
-    set_color(&window->foreground, 0, 0, 0, 255);
+    set_color(&window->foreground, 0, 0, 0, 255); // Dessine le score
     string scr = "Score:" + to_string(game->score);
     draw_fill_rectangle(window, 0, window->height - case_sizeY, window->width, case_sizeY);
     draw_text(window, scr, 0, window->height - case_sizeY);
@@ -623,7 +607,7 @@ bool keyboard_eventGameOver(Game *game, Window *window) // regarde les actions d
     return false;
 }
 
-bool checkBody(Game *game, int pos)
+bool checkBody(Game *game, int pos) // vérifie qu'un body du snake n'est pas à la position en paramètre
 {
     Body *temp = game->snake.neck;
     while (temp != nullptr)
@@ -637,7 +621,7 @@ bool checkBody(Game *game, int pos)
     return false;
 }
 
-void spawn(Game *game, Block type)
+void spawn(Game *game, Block type)  // fait spawn un block du type en paramètre à un endroit vide aléatoire.
 {
     int rngpos;
     do

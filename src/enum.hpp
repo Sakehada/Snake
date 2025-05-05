@@ -1,5 +1,5 @@
 
-enum ESample
+enum ESample // Samples des bruits 
 {
     Eat,
     StarS,
@@ -7,13 +7,13 @@ enum ESample
     Music1
 };
 
-enum SoundType
+enum SoundType // Types de son
 {
     Music,
     Effect
 };
 
-enum BodyType
+enum BodyType // Types de corps
 {
     RBODY,
     GBODY,
@@ -21,7 +21,7 @@ enum BodyType
     NBODY
 };
 
-enum Block
+enum Block // Types de blocks
 {
     R,
     G,
@@ -30,7 +30,7 @@ enum Block
     Star
 };
 
-enum Direction
+enum Direction // Direction
 {
     HAUT,
     BAS,
@@ -38,7 +38,7 @@ enum Direction
     DROITE
 };
 
-enum Statut
+enum Statut // Statut du jeu
 {
     Play,
     Pause,

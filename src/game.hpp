@@ -33,7 +33,7 @@ struct Snake
 
 struct Game
 {
-    Mixer *mixer;
+    Mixer *mixer; // moteur audio
     World *world;
     Snake snake;
     int score;
