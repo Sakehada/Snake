@@ -347,12 +347,15 @@ void move_snake(Window *window, Game *game, int *delay)
 
             while (temp2->next != nullptr)
             {
+                if(temp2->pos == pos){
+                    game->statut = GameOver;
+                    return;
+                }
                 temp2->pos = temp2->next->pos;
                 temp2 = temp2->next;
             }
             temp2->pos = game->snake.head;
             game->snake.head = pos;
-
             return;
         default:
             cout << "defaut" << endl;
