@@ -21,7 +21,6 @@ void write(World *world, int x, int y, Block b)
     int i = getId(x, y, world->width);
     if (i < 0 or i > world->height * world->width)
     {
-        cout << "Erreur de coordonnee" << endl;
         return;
     }
     else

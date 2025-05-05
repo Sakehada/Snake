@@ -28,7 +28,6 @@ void load_game(Game *game, string filename) // Charge une sauvegarde
     play(game->mixer, Music1);                                                                 // On lance la musique
     game->world = new World;                                    
 
-    cout << "etape 1" << endl;
     ifstream fic(filename.c_str());
     if (fic)
     {
@@ -36,7 +35,6 @@ void load_game(Game *game, string filename) // Charge une sauvegarde
         fic >> game->world->height;
 
         init_world(game->world, game->world->width, game->world->height);
-        cout << "etape 2" << endl;
         string line;
         for (int i = 0; i < game->world->height; i++)
         {
@@ -82,7 +80,6 @@ void load_game(Game *game, string filename) // Charge une sauvegarde
         int taille;
         char Type;
         fic >> taille; // On prend la taille du snake
-        cout << taille;
         Body *ptrcurrent = game->snake.neck;
         ptrcurrent = new Body;
         for (int i = 0; i < taille; i++) // Pour le nombre de Body du snake
@@ -233,7 +230,6 @@ void feed(Game *game, Block type, int pos)  // Fait grandir le snake, vide la ca
 {
     play(game->mixer, Eat, 500);    // Joue le son de manger pendant 500ms
     Body *a = new Body;             // Initie le body du type de la nourriture
-    cout << "A " << a << endl; 
     a->type = (BodyType)type;
     a->pos = game->snake.head;      // Definis la position du body au niveau de la tete.
     if (game->snake.queue->type == NBODY)   // Si le corps est vide, on définis la tete et le cou comme étant le nouveau body
@@ -341,13 +337,10 @@ void move_snake(Window *window, Game *game, int *delay) // Fait avancer le serpe
             game->snake.head = pos;
             return;
         default:
-            cout << "defaut" << endl;
             feed(game, game->world->grid[pos], pos);    // si le block n'est pas empty ou star, fait grandir le snake et y ajoutant un body du type du block
-            cout << "passer" << endl;
             break;
         }
     }
-    cout << "fin move" << endl;
 }
 
 void change_statut(Statut *statut) 

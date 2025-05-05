@@ -90,9 +90,6 @@ int main(int argc, char **argv)
                 {
                 case 1:
                     load_game(&game, "./assets/map/Save1.txt");
-                    cout << "Direction: " << game.directions << endl;
-                    cout << "Score: " << game.score << endl;
-                    cout << "Direction: " << game.statut << endl;
                     game.statut = Play;
                     break;
                 case 2:
@@ -154,7 +151,6 @@ int main(int argc, char **argv)
             {
                 delay += 10;
             }
-            cout << game.snake.head << endl;
             break;
 
         case GameOver:   // affiche le menu de défaite
